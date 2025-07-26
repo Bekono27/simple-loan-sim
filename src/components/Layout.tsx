@@ -1,33 +1,27 @@
 import { ReactNode } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, User, LogOut } from "lucide-react";
+import { ArrowLeft, Bell } from "lucide-react";
+import { BottomNavigation } from "./BottomNavigation";
 
 interface LayoutProps {
   children: ReactNode;
   title?: string;
   showBack?: boolean;
-  showProfile?: boolean;
+  showBottomNav?: boolean;
 }
 
-export const Layout = ({ children, title, showBack = true, showProfile = false }: LayoutProps) => {
+export const Layout = ({ children, title, showBack = true, showBottomNav = true }: LayoutProps) => {
   const navigate = useNavigate();
   const location = useLocation();
-  const isLoggedIn = localStorage.getItem("simple_loan_user");
-
-  const handleLogout = () => {
-    localStorage.removeItem("simple_loan_user");
-    localStorage.removeItem("simple_loan_data");
-    navigate("/");
-  };
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Header */}
-      <header className="bg-card border-b border-border p-4">
+      {/* Top Header */}
+      <header className="bg-card border-b border-border/50 px-4 py-3 sticky top-0 z-40 backdrop-blur-lg bg-card/95">
         <div className="flex items-center justify-between max-w-md mx-auto">
           <div className="flex items-center gap-3">
-            {showBack && location.pathname !== "/" && (
+            {showBack && location.pathname !== "/" && location.pathname !== "/dashboard" && (
               <Button
                 variant="ghost"
                 size="sm"
@@ -37,36 +31,32 @@ export const Layout = ({ children, title, showBack = true, showProfile = false }
                 <ArrowLeft className="w-5 h-5" />
               </Button>
             )}
-            {title && <h1 className="font-semibold text-lg">{title}</h1>}
+            {title ? (
+              <h1 className="font-semibold text-lg text-foreground">{title}</h1>
+            ) : (
+              <h1 className="font-bold text-xl text-primary">Простой Зээл</h1>
+            )}
           </div>
           
-          {showProfile && isLoggedIn && (
-            <div className="flex items-center gap-2">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => navigate("/profile")}
-                className="p-2 h-auto"
-              >
-                <User className="w-5 h-5" />
-              </Button>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={handleLogout}
-                className="p-2 h-auto text-destructive"
-              >
-                <LogOut className="w-5 h-5" />
-              </Button>
-            </div>
+          {location.pathname === "/dashboard" && (
+            <Button
+              variant="ghost"
+              size="sm"
+              className="p-2 h-auto"
+            >
+              <Bell className="w-5 h-5" />
+            </Button>
           )}
         </div>
       </header>
 
       {/* Content */}
-      <main className="max-w-md mx-auto">
+      <main className="max-w-md mx-auto pb-20">
         {children}
       </main>
+
+      {/* Bottom Navigation */}
+      {showBottomNav && <BottomNavigation />}
     </div>
   );
 };

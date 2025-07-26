@@ -71,7 +71,7 @@ export const Login = () => {
   };
 
   return (
-    <Layout title="Login" showProfile={false}>
+    <Layout title="Нэвтрэх" showBottomNav={false}>
       <div className="p-4">
         <Card className="p-6">
           {step === "phone" ? (
