@@ -43,17 +43,8 @@ export const Repayment = () => {
     
     if (!amount || amount < 1000) {
       toast({
-        title: "Invalid amount",
-        description: "Minimum payment is ₮1,000",
-        variant: "destructive"
-      });
-      return;
-    }
-
-    if (amount > loanData.activeLoan.balance) {
-      toast({
-        title: "Amount too high",
-        description: "Payment cannot exceed remaining balance",
+        title: "Буруу дүн",
+        description: "Хамгийн бага төлбөр ₮1,000",
         variant: "destructive"
       });
       return;
@@ -64,64 +55,51 @@ export const Repayment = () => {
 
   const handlePaymentComplete = () => {
     const amount = parseInt(paymentAmount);
-    const newBalance = loanData.activeLoan.balance - amount;
-    const newTotalPaid = loanData.totalPaid + amount;
+    
+    // Зээлийн үлдэгдэл шинэчлэх
+    if (loanData?.activeLoan) {
+      const updatedBalance = Math.max(0, loanData.activeLoan.balance - amount);
+      const updatedLoanData = {
+        ...loanData,
+        activeLoan: {
+          ...loanData.activeLoan,
+          balance: updatedBalance,
+          status: updatedBalance === 0 ? "completed" : "active"
+        }
+      };
+      
+      localStorage.setItem("simple_loan_data", JSON.stringify(updatedLoanData));
+      setLoanData(updatedLoanData);
+    }
 
-    const updatedLoanData = {
-      ...loanData,
-      activeLoan: newBalance > 0 ? {
-        ...loanData.activeLoan,
-        balance: newBalance,
-        status: "active" as const
-      } : null,
-      totalPaid: newTotalPaid
-    };
-
-    localStorage.setItem("simple_loan_data", JSON.stringify(updatedLoanData));
     setPaymentComplete(true);
+    setShowQR(false);
     
     toast({
-      title: "Payment successful!",
-      description: `₮${amount.toLocaleString()} has been paid`,
+      title: "Төлбөр амжилттай!",
+      description: `₮${parseInt(paymentAmount).toLocaleString()} төлбөр амжилттай төлөгдлөө`,
     });
 
     setTimeout(() => {
+      setPaymentComplete(false);
       navigate("/dashboard");
-    }, 2000);
+    }, 3000);
   };
-
-  if (!loanData || !loanData.activeLoan) {
-    return (
-      <Layout title="Repayment">
-        <div className="p-4">
-          <Card className="p-8 text-center">
-            <h2 className="text-xl font-semibold mb-2">No Active Loan</h2>
-            <p className="text-muted-foreground mb-4">
-              You don't have any active loans to repay
-            </p>
-            <Button onClick={() => navigate("/dashboard")}>
-              Back to Dashboard
-            </Button>
-          </Card>
-        </div>
-      </Layout>
-    );
-  }
 
   if (paymentComplete) {
     return (
-      <Layout title="Payment Complete">
+      <Layout title="Төлбөр төлөх">
         <div className="p-4">
           <Card className="p-8 text-center">
             <div className="w-16 h-16 bg-success/10 rounded-full flex items-center justify-center mx-auto mb-4">
               <CheckCircle className="w-8 h-8 text-success" />
             </div>
-            <h2 className="text-xl font-semibold mb-2 text-success">Payment Successful!</h2>
+            <h2 className="text-xl font-semibold mb-2 text-success">Төлбөр амжилттай!</h2>
             <p className="text-muted-foreground mb-4">
-              Your payment of ₮{parseInt(paymentAmount).toLocaleString()} has been processed
+              ₮{parseInt(paymentAmount).toLocaleString()} төлбөр амжилттай төлөгдлөө
             </p>
             <p className="text-sm text-muted-foreground">
-              Redirecting to dashboard...
+              Хэтэвч рүү шилжүүлж байна...
             </p>
           </Card>
         </div>
@@ -131,23 +109,23 @@ export const Repayment = () => {
 
   if (showQR) {
     return (
-      <Layout title="QPay Payment">
+      <Layout title="QPay төлбөр">
         <div className="p-4">
           <Card className="p-6">
             <div className="text-center mb-6">
               <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
                 <QrCode className="w-8 h-8 text-primary" />
               </div>
-              <h2 className="text-xl font-semibold mb-2">Scan to Pay</h2>
-              <p className="text-muted-foreground">Use your banking app to scan the QR code</p>
+              <h2 className="text-xl font-semibold mb-2">QPay QR код</h2>
+              <p className="text-muted-foreground">Банкны апп-аараа QR кодыг уншуулна уу</p>
             </div>
 
             {/* Mock QR Code */}
-            <div className="bg-white p-4 rounded-lg border-2 border-dashed border-muted mb-6">
-              <div className="w-full aspect-square bg-gradient-to-br from-gray-900 via-gray-700 to-gray-900 rounded-lg flex items-center justify-center">
+            <div className="bg-white p-6 rounded-lg border-2 border-dashed border-muted mb-6">
+              <div className="w-full aspect-square bg-gradient-to-br from-primary to-primary/70 rounded-lg flex items-center justify-center">
                 <div className="text-white text-center">
-                  <QrCode className="w-16 h-16 mx-auto mb-2" />
-                  <p className="text-sm">QPay QR Code</p>
+                  <QrCode className="w-20 h-20 mx-auto mb-2" />
+                  <p className="text-sm font-semibold">QPay</p>
                   <p className="text-xs">₮{parseInt(paymentAmount).toLocaleString()}</p>
                 </div>
               </div>
@@ -155,12 +133,16 @@ export const Repayment = () => {
 
             <div className="space-y-3 mb-6">
               <div className="flex justify-between">
-                <span className="text-muted-foreground">Payment Amount</span>
+                <span className="text-muted-foreground">Хүлээн авагч</span>
+                <span className="font-semibold">Энгийн Зээл ХХК</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">Дүн</span>
                 <span className="font-semibold">₮{parseInt(paymentAmount).toLocaleString()}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-muted-foreground">Merchant</span>
-                <span className="font-semibold">Simple Loan</span>
+                <span className="text-muted-foreground">Утга</span>
+                <span className="font-semibold">Зээлийн төлбөр</span>
               </div>
             </div>
 
@@ -169,19 +151,19 @@ export const Repayment = () => {
                 onClick={handlePaymentComplete}
                 className="w-full"
               >
-                I've Completed Payment
+                Төлбөр хийгдсэн
               </Button>
               <Button 
                 onClick={() => setShowQR(false)}
                 variant="outline"
                 className="w-full"
               >
-                Back
+                Цуцлах
               </Button>
             </div>
 
             <p className="text-xs text-muted-foreground text-center mt-4">
-              This is a demo QR code for testing purposes
+              Энэ бол туршилтын QR код бөгөөд бодит төлбөр хийхгүй
             </p>
           </Card>
         </div>
@@ -189,29 +171,52 @@ export const Repayment = () => {
     );
   }
 
+  if (!loanData?.activeLoan) {
+    return (
+      <Layout title="Төлбөр төлөх">
+        <div className="p-4">
+          <Card className="p-8 text-center">
+            <h2 className="text-xl font-semibold mb-2">Идэвхтэй зээл байхгүй</h2>
+            <p className="text-muted-foreground mb-4">
+              Танд одоогоор төлөх ёстой зээл байхгүй байна
+            </p>
+            <Button onClick={() => navigate("/dashboard")}>
+              Хэтэвч рүү буцах
+            </Button>
+          </Card>
+        </div>
+      </Layout>
+    );
+  }
+
   return (
-    <Layout title="Loan Repayment">
+    <Layout title="Төлбөр төлөх">
       <div className="p-4 space-y-6">
-        {/* Loan Summary */}
-        <Card className="p-4">
-          <h3 className="font-semibold mb-3">Loan Summary</h3>
-          <div className="space-y-2">
+        {/* Header */}
+        <Card className="p-6 text-center">
+          <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
+            <CreditCard className="w-8 h-8 text-primary" />
+          </div>
+          <h1 className="text-2xl font-bold mb-2">Зээлийн төлбөр</h1>
+          <p className="text-muted-foreground">QPay эсвэл банкны картаар төлнө үү</p>
+        </Card>
+
+        {/* Current Loan Info */}
+        <Card className="p-6">
+          <h3 className="font-semibold mb-4">Идэвхтэй зээл</h3>
+          <div className="space-y-3">
             <div className="flex justify-between">
-              <span className="text-muted-foreground">Outstanding Balance</span>
-              <span className="font-semibold text-lg">₮{loanData.activeLoan.balance.toLocaleString()}</span>
+              <span className="text-muted-foreground">Үлдэгдэл</span>
+              <span className="font-bold text-xl">₮{loanData.activeLoan.balance.toLocaleString()}</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-muted-foreground">Monthly Payment</span>
+              <span className="text-muted-foreground">Сарын төлбөр</span>
               <span className="font-semibold">₮{loanData.activeLoan.monthlyPayment.toLocaleString()}</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-muted-foreground">Next Due Date</span>
-              <span className="font-semibold">{loanData.activeLoan.nextPayment}</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">Status</span>
-              <Badge variant="secondary" className="bg-success/10 text-success">
-                {loanData.activeLoan.status.toUpperCase()}
+              <span className="text-muted-foreground">Статус</span>
+              <Badge variant={loanData.activeLoan.status === "active" ? "default" : "secondary"}>
+                {loanData.activeLoan.status === "active" ? "Идэвхтэй" : "Дууссан"}
               </Badge>
             </div>
           </div>
@@ -219,17 +224,10 @@ export const Repayment = () => {
 
         {/* Payment Form */}
         <Card className="p-6">
-          <div className="text-center mb-6">
-            <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
-              <CreditCard className="w-8 h-8 text-primary" />
-            </div>
-            <h2 className="text-xl font-semibold mb-2">Make a Payment</h2>
-            <p className="text-muted-foreground">Choose your payment amount</p>
-          </div>
-
+          <h3 className="font-semibold mb-4">Төлбөрийн дүн</h3>
           <div className="space-y-4">
             <div>
-              <Label htmlFor="amount">Payment Amount (₮)</Label>
+              <Label htmlFor="amount">Төлөх дүн (₮)</Label>
               <Input
                 id="amount"
                 type="number"
@@ -239,57 +237,65 @@ export const Repayment = () => {
                 max={loanData.activeLoan.balance}
               />
               <p className="text-xs text-muted-foreground mt-1">
-                Minimum: ₮1,000 | Maximum: ₮{loanData.activeLoan.balance.toLocaleString()}
+                Хамгийн бага: ₮1,000
               </p>
             </div>
 
-            {/* Quick Amount Buttons */}
+            {/* Quick Payment Options */}
             <div className="space-y-2">
-              <Label>Quick Select</Label>
+              <p className="text-sm font-medium">Хурдан сонголт</p>
               <div className="grid grid-cols-2 gap-2">
                 <Button
                   variant="outline"
                   size="sm"
                   onClick={() => setPaymentAmount(loanData.activeLoan.monthlyPayment.toString())}
-                  className="text-xs"
                 >
-                  Monthly Payment
-                  <br />₮{loanData.activeLoan.monthlyPayment.toLocaleString()}
+                  Сарын төлбөр
                 </Button>
                 <Button
                   variant="outline"
                   size="sm"
                   onClick={() => setPaymentAmount(loanData.activeLoan.balance.toString())}
-                  className="text-xs"
                 >
-                  Full Balance
-                  <br />₮{loanData.activeLoan.balance.toLocaleString()}
+                  Бүх үлдэгдэл
                 </Button>
               </div>
             </div>
 
-            <Button 
-              onClick={handlePaymentSubmit}
-              className="w-full"
-              disabled={!paymentAmount || parseInt(paymentAmount) < 1000}
-            >
-              Proceed to Payment
+            <Button onClick={handlePaymentSubmit} className="w-full">
+              QPay-аар төлөх
             </Button>
           </div>
         </Card>
 
         {/* Payment Methods */}
         <Card className="p-4">
-          <h3 className="font-semibold mb-3">Accepted Payment Methods</h3>
-          <div className="space-y-2">
-            <div className="flex items-center gap-3 p-2 border rounded-lg">
-              <QrCode className="w-6 h-6 text-primary" />
-              <div>
-                <div className="font-medium">QPay</div>
-                <div className="text-sm text-muted-foreground">Scan QR code with your banking app</div>
-              </div>
+          <h3 className="font-medium mb-3">Төлбөрийн аргууд</h3>
+          <div className="space-y-2 text-sm">
+            <div className="flex items-center justify-between py-2 border-b border-border">
+              <span>QPay QR код</span>
+              <Badge variant="secondary">Идэвхтэй</Badge>
+            </div>
+            <div className="flex items-center justify-between py-2 border-b border-border">
+              <span>Банкны шилжүүлэг</span>
+              <Badge variant="outline">Удахгүй</Badge>
+            </div>
+            <div className="flex items-center justify-between py-2">
+              <span>Автомат суутгах</span>
+              <Badge variant="outline">Тохируулах</Badge>
             </div>
           </div>
+        </Card>
+
+        {/* Important Notes */}
+        <Card className="p-4">
+          <h3 className="font-medium mb-2">Анхаарах зүйлс</h3>
+          <ul className="text-sm text-muted-foreground space-y-1">
+            <li>• Төлбөр боловсруулахад 1-2 өдөр хугацаа шаардагдана</li>
+            <li>• Хоцрогдсон төлбөрт нэмэлт төлбөр ногдуулна</li>
+            <li>• Урьдчилан төлбөр төлөхөд торгууль байхгүй</li>
+            <li>• Асуудал гарвал 24/7 тусламжтай холбогдоно уу</li>
+          </ul>
         </Card>
       </div>
     </Layout>

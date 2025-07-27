@@ -26,7 +26,7 @@ export const LoanApplication = () => {
   const { toast } = useToast();
 
   const calculateRepayment = (loanAmount: number, months: number): RepaymentPlan => {
-    const interestRate = 0.15; // 15% annual interest rate
+    const interestRate = 0.15; // 15% жилийн хүү
     const monthlyRate = interestRate / 12;
     const monthlyPayment = (loanAmount * monthlyRate * Math.pow(1 + monthlyRate, months)) / 
                           (Math.pow(1 + monthlyRate, months) - 1);
@@ -46,8 +46,8 @@ export const LoanApplication = () => {
 
     if (!loanAmount || loanAmount < 100000 || loanAmount > 10000000) {
       toast({
-        title: "Invalid amount",
-        description: "Amount must be between ₮100,000 and ₮10,000,000",
+        title: "Буруу дүн",
+        description: "Дүн нь ₮100,000-₮10,000,000 хооронд байх ёстой",
         variant: "destructive"
       });
       return;
@@ -55,8 +55,8 @@ export const LoanApplication = () => {
 
     if (!loanTerm || loanTerm < 3 || loanTerm > 40) {
       toast({
-        title: "Invalid term",
-        description: "Term must be between 3 and 40 months",
+        title: "Буруу хугацаа",
+        description: "Хугацаа нь 3-40 сарын хооронд байх ёстой",
         variant: "destructive"
       });
       return;
@@ -66,210 +66,116 @@ export const LoanApplication = () => {
     setRepaymentPlan(plan);
   };
 
-  const handleSubmit = async () => {
+  const handleSubmit = () => {
     if (!repaymentPlan) {
-      handleCalculate();
+      toast({
+        title: "Эхлээд тооцоолно уу",
+        description: "Төлбөрийн төлөвлөгөө гаргаснаа дараа хүсэлт илгээнэ үү",
+        variant: "destructive"
+      });
       return;
     }
 
-    setLoading(true);
     setStep("processing");
+    setLoading(true);
 
-    // Simulate credit scoring and approval process
+    // Зээлийн үнэлгээ симуляци
     setTimeout(() => {
-      const loanAmount = parseInt(amount);
-      const creditScore = Math.random() * 300 + 500; // Random score between 500-800
-      const isApproved = creditScore > 600 && loanAmount <= 5000000; // Simple approval logic
-
-      setApprovalResult(isApproved ? "approved" : "rejected");
+      const approved = Math.random() > 0.3; // 70% зөвшөөрөх магадлал
+      setApprovalResult(approved ? "approved" : "rejected");
       setStep("result");
       setLoading(false);
 
-      if (isApproved) {
-        // Save loan data
+      if (approved) {
+        // Зээлийн мэдээлэл хадгалах
         const loanData = {
-          activeLoan: {
-            amount: loanAmount,
-            balance: loanAmount,
-            monthlyPayment: repaymentPlan.monthlyPayment,
-            nextPayment: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toLocaleDateString(),
-            term: parseInt(term),
-            status: "active" as const
-          },
-          creditScore: Math.round(creditScore),
-          totalPaid: 0
+          id: Date.now().toString(),
+          amount: parseInt(amount),
+          term: parseInt(term),
+          monthlyPayment: repaymentPlan.monthlyPayment,
+          totalAmount: repaymentPlan.totalAmount,
+          status: "active",
+          approvedDate: new Date().toISOString(),
+          balance: parseInt(amount)
         };
 
-        localStorage.setItem("simple_loan_data", JSON.stringify(loanData));
+        localStorage.setItem("simple_loan_data", JSON.stringify({
+          activeLoan: loanData,
+          loanHistory: [loanData]
+        }));
 
         toast({
-          title: "Congratulations!",
-          description: "Your loan has been approved!",
+          title: "Зээл зөвшөөрөгдлөө!",
+          description: "Таны зээлийн хүсэлт амжилттай зөвшөөрөгдлөө",
         });
       } else {
         toast({
-          title: "Application declined",
-          description: "Please try with a smaller amount or improve your credit score",
+          title: "Зээл татгалзагдлаа",
+          description: "Уучлаарай, таны хүсэлт одоогоор зөвшөөрөгдөх боломжгүй",
           variant: "destructive"
         });
       }
     }, 3000);
   };
 
-  const handleAcceptLoan = () => {
-    toast({
-      title: "Loan activated!",
-      description: "Funds will be transferred to your account within 24 hours",
-    });
-    navigate("/dashboard");
-  };
-
-  return (
-    <Layout title="Loan Application">
-      <div className="p-4">
-        {step === "application" && (
-          <div className="space-y-6">
-            <Card className="p-6">
-              <div className="text-center mb-6">
-                <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <Calculator className="w-8 h-8 text-primary" />
-                </div>
-                <h2 className="text-xl font-semibold mb-2">Loan Application</h2>
-                <p className="text-muted-foreground">Get instant approval in minutes</p>
-              </div>
-
-              <div className="space-y-4">
-                <div>
-                  <Label htmlFor="amount">Loan Amount (₮)</Label>
-                  <Input
-                    id="amount"
-                    type="number"
-                    placeholder="1,000,000"
-                    value={amount}
-                    onChange={(e) => setAmount(e.target.value)}
-                    min="100000"
-                    max="10000000"
-                  />
-                  <p className="text-xs text-muted-foreground mt-1">
-                    Minimum: ₮100,000 | Maximum: ₮10,000,000
-                  </p>
-                </div>
-
-                <div>
-                  <Label htmlFor="term">Repayment Term (months)</Label>
-                  <Input
-                    id="term"
-                    type="number"
-                    placeholder="12"
-                    value={term}
-                    onChange={(e) => setTerm(e.target.value)}
-                    min="3"
-                    max="40"
-                  />
-                  <p className="text-xs text-muted-foreground mt-1">
-                    Minimum: 3 months | Maximum: 40 months
-                  </p>
-                </div>
-
-                <Button 
-                  onClick={handleCalculate}
-                  variant="outline"
-                  className="w-full"
-                  disabled={!amount || !term}
-                >
-                  Calculate Repayment
-                </Button>
-              </div>
-            </Card>
-
-            {repaymentPlan && (
-              <Card className="p-6">
-                <h3 className="font-semibold mb-4">Repayment Plan</h3>
-                <div className="space-y-3">
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">Loan Amount</span>
-                    <span className="font-semibold">₮{parseInt(amount).toLocaleString()}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">Monthly Payment</span>
-                    <span className="font-semibold">₮{repaymentPlan.monthlyPayment.toLocaleString()}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">Total Interest</span>
-                    <span className="font-semibold">₮{repaymentPlan.totalInterest.toLocaleString()}</span>
-                  </div>
-                  <div className="flex justify-between border-t pt-3">
-                    <span className="text-muted-foreground">Total Amount</span>
-                    <span className="font-semibold text-lg">₮{repaymentPlan.totalAmount.toLocaleString()}</span>
-                  </div>
-                </div>
-
-                <Button 
-                  onClick={handleSubmit}
-                  className="w-full mt-6"
-                  disabled={loading}
-                >
-                  Submit Application
-                </Button>
-              </Card>
-            )}
-          </div>
-        )}
-
-        {step === "processing" && (
+  if (step === "processing") {
+    return (
+      <Layout title="Зээлийн хүсэлт">
+        <div className="p-4">
           <Card className="p-8 text-center">
-            <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
-              <Clock className="w-8 h-8 text-primary animate-spin" />
+            <div className="w-16 h-16 bg-warning/10 rounded-full flex items-center justify-center mx-auto mb-4 animate-pulse">
+              <Clock className="w-8 h-8 text-warning" />
             </div>
-            <h2 className="text-xl font-semibold mb-2">Processing Application</h2>
+            <h2 className="text-xl font-semibold mb-2">Зээлийн үнэлгээ хийж байна...</h2>
             <p className="text-muted-foreground mb-4">
-              We're checking your credit score and verifying your information...
+              Таны мэдээллийг шалгаж, зээлийн үнэлгээ хийж байна
             </p>
-            <div className="flex justify-center">
-              <div className="animate-pulse text-sm text-muted-foreground">
-                This usually takes 2-3 minutes
-              </div>
+            <div className="w-full bg-muted rounded-full h-2">
+              <div className="bg-primary h-2 rounded-full animate-pulse" style={{ width: "70%" }}></div>
             </div>
+            <p className="text-sm text-muted-foreground mt-2">Энэ нь хэдхэн минут үргэлжилнэ...</p>
           </Card>
-        )}
+        </div>
+      </Layout>
+    );
+  }
 
-        {step === "result" && (
+  if (step === "result") {
+    return (
+      <Layout title="Зээлийн хариу">
+        <div className="p-4">
           <Card className="p-8 text-center">
             {approvalResult === "approved" ? (
               <>
                 <div className="w-16 h-16 bg-success/10 rounded-full flex items-center justify-center mx-auto mb-4">
                   <CheckCircle className="w-8 h-8 text-success" />
                 </div>
-                <h2 className="text-xl font-semibold mb-2 text-success">Application Approved!</h2>
+                <h2 className="text-xl font-semibold mb-2 text-success">Зээл зөвшөөрөгдлөө!</h2>
                 <p className="text-muted-foreground mb-6">
-                  Congratulations! Your loan application has been approved.
+                  Баяр хүргэе! Таны зээлийн хүсэлт амжилттай зөвшөөрөгдлөө.
                 </p>
                 
-                <div className="text-left space-y-3 mb-6">
+                <div className="space-y-3 mb-6 text-left">
                   <div className="flex justify-between">
-                    <span>Approved Amount:</span>
+                    <span className="text-muted-foreground">Зээлийн дүн</span>
                     <span className="font-semibold">₮{parseInt(amount).toLocaleString()}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span>Monthly Payment:</span>
-                    <span className="font-semibold">₮{repaymentPlan?.monthlyPayment.toLocaleString()}</span>
+                    <span className="text-muted-foreground">Хугацаа</span>
+                    <span className="font-semibold">{term} сар</span>
                   </div>
                   <div className="flex justify-between">
-                    <span>Term:</span>
-                    <span className="font-semibold">{term} months</span>
+                    <span className="text-muted-foreground">Сарын төлбөр</span>
+                    <span className="font-semibold">₮{repaymentPlan?.monthlyPayment.toLocaleString()}</span>
                   </div>
                 </div>
 
                 <div className="space-y-3">
-                  <Button onClick={handleAcceptLoan} className="w-full">
-                    Accept Loan
+                  <Button onClick={() => navigate("/dashboard")} className="w-full">
+                    Хэтэвч рүү шилжих
                   </Button>
-                  <Button 
-                    onClick={() => navigate("/dashboard")} 
-                    variant="outline" 
-                    className="w-full"
-                  >
-                    Review Later
+                  <Button onClick={() => navigate("/repay")} variant="outline" className="w-full">
+                    Төлбөр төлөх
                   </Button>
                 </div>
               </>
@@ -278,36 +184,130 @@ export const LoanApplication = () => {
                 <div className="w-16 h-16 bg-destructive/10 rounded-full flex items-center justify-center mx-auto mb-4">
                   <XCircle className="w-8 h-8 text-destructive" />
                 </div>
-                <h2 className="text-xl font-semibold mb-2 text-destructive">Application Declined</h2>
+                <h2 className="text-xl font-semibold mb-2 text-destructive">Зээл татгалзагдлаа</h2>
                 <p className="text-muted-foreground mb-6">
-                  Unfortunately, we cannot approve your loan application at this time.
+                  Уучлаарай, таны зээлийн хүсэлт одоогоор зөвшөөрөгдөх боломжгүй байна.
                 </p>
                 
                 <div className="space-y-3">
-                  <Button 
-                    onClick={() => {
-                      setStep("application");
-                      setAmount("");
-                      setTerm("");
-                      setRepaymentPlan(null);
-                      setApprovalResult(null);
-                    }}
-                    variant="outline" 
-                    className="w-full"
-                  >
-                    Try Different Amount
+                  <Button onClick={() => navigate("/support")} className="w-full">
+                    Тусламж авах
                   </Button>
-                  <Button 
-                    onClick={() => navigate("/dashboard")} 
-                    className="w-full"
-                  >
-                    Back to Dashboard
+                  <Button onClick={() => navigate("/dashboard")} variant="outline" className="w-full">
+                    Хэтэвч рүү буцах
                   </Button>
                 </div>
               </>
             )}
           </Card>
+        </div>
+      </Layout>
+    );
+  }
+
+  return (
+    <Layout title="Зээлийн хүсэлт">
+      <div className="p-4 space-y-6">
+        {/* Header */}
+        <Card className="p-6 text-center">
+          <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
+            <Calculator className="w-8 h-8 text-primary" />
+          </div>
+          <h1 className="text-2xl font-bold mb-2">Зээлийн хүсэлт</h1>
+          <p className="text-muted-foreground">Зээлийн дүн болон хугацаагаа сонгоно уу</p>
+        </Card>
+
+        {/* Loan Form */}
+        <Card className="p-6">
+          <div className="space-y-4">
+            <div>
+              <Label htmlFor="amount">Зээлийн дүн (₮)</Label>
+              <Input
+                id="amount"
+                type="number"
+                placeholder="1,000,000"
+                value={amount}
+                onChange={(e) => setAmount(e.target.value)}
+                min="100000"
+                max="10000000"
+              />
+              <p className="text-xs text-muted-foreground mt-1">
+                Хамгийн бага: ₮100,000 - Хамгийн их: ₮10,000,000
+              </p>
+            </div>
+
+            <div>
+              <Label htmlFor="term">Хугацаа (сар)</Label>
+              <Input
+                id="term"
+                type="number"
+                placeholder="12"
+                value={term}
+                onChange={(e) => setTerm(e.target.value)}
+                min="3"
+                max="40"
+              />
+              <p className="text-xs text-muted-foreground mt-1">
+                3-40 сарын хооронд
+              </p>
+            </div>
+
+            <Button onClick={handleCalculate} className="w-full">
+              Төлбөрийн төлөвлөгөө тооцоолох
+            </Button>
+          </div>
+        </Card>
+
+        {/* Repayment Plan */}
+        {repaymentPlan && (
+          <Card className="p-6">
+            <h3 className="font-semibold mb-4">Төлбөрийн төлөвлөгөө</h3>
+            <div className="space-y-3">
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">Зээлийн дүн</span>
+                <span className="font-semibold">₮{parseInt(amount).toLocaleString()}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">Сарын төлбөр</span>
+                <span className="font-semibold text-primary">
+                  ₮{repaymentPlan.monthlyPayment.toLocaleString()}
+                </span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">Нийт хүү</span>
+                <span className="font-semibold">₮{repaymentPlan.totalInterest.toLocaleString()}</span>
+              </div>
+              <div className="flex justify-between border-t pt-3">
+                <span className="text-muted-foreground">Нийт төлөх дүн</span>
+                <span className="font-bold text-lg">₮{repaymentPlan.totalAmount.toLocaleString()}</span>
+              </div>
+            </div>
+
+            <div className="mt-6 p-4 bg-muted rounded-lg">
+              <div className="flex items-center gap-2 mb-2">
+                <Badge variant="secondary">15% жилийн хүү</Badge>
+              </div>
+              <p className="text-sm text-muted-foreground">
+                Хүүгийн хэмжээ таны зээлийн түүх болон орлогоос хамаарч өөрчлөгдөж болно
+              </p>
+            </div>
+
+            <Button onClick={handleSubmit} disabled={loading} className="w-full mt-4">
+              {loading ? "Илгээж байна..." : "Зээлийн хүсэлт илгээх"}
+            </Button>
+          </Card>
         )}
+
+        {/* Info */}
+        <Card className="p-4">
+          <h3 className="font-medium mb-2">Анхаарах зүйлс</h3>
+          <ul className="text-sm text-muted-foreground space-y-1">
+            <li>• Зээлийн хүү 15%-аас эхэлнэ</li>
+            <li>• Урьдчилан төлбөр төлөхөд торгууль байхгүй</li>
+            <li>• Автомат суутгах тохиргоо боломжтой</li>
+            <li>• 24/7 тусламжийн үйлчилгээ</li>
+          </ul>
+        </Card>
       </div>
     </Layout>
   );

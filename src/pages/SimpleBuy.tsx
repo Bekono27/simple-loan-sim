@@ -9,22 +9,22 @@ import { QrCode, ShoppingCart, CheckCircle, Store } from "lucide-react";
 const mockMerchants = [
   {
     id: "1",
-    name: "TechWorld Store",
+    name: "Техник Ертөнц",
     item: "iPhone 15 Pro",
     price: 2500000,
     image: "📱"
   },
   {
     id: "2", 
-    name: "Fashion Hub",
-    item: "Winter Jacket",
+    name: "Загварын Төв",
+    item: "Өвлийн куртка",
     price: 180000,
     image: "🧥"
   },
   {
     id: "3",
-    name: "Home Essentials",
-    item: "Coffee Machine",
+    name: "Гэрийн хэрэгсэл",
+    item: "Кофе машин",
     price: 320000,
     image: "☕"
   }
@@ -44,8 +44,8 @@ export const SimpleBuy = () => {
   const handlePaymentComplete = () => {
     setPurchaseComplete(true);
     toast({
-      title: "Purchase successful!",
-      description: `You've purchased ${selectedMerchant.item} with Simple Buy`,
+      title: "Худалдан авалт амжилттай!",
+      description: `Та ${selectedMerchant.item} Энгийн Худалдаа-аар худалдан авлаа`,
     });
 
     setTimeout(() => {
@@ -57,18 +57,18 @@ export const SimpleBuy = () => {
 
   if (purchaseComplete) {
     return (
-      <Layout title="Purchase Complete">
+      <Layout title="Худалдан авалт дууслаа">
         <div className="p-4">
           <Card className="p-8 text-center">
             <div className="w-16 h-16 bg-success/10 rounded-full flex items-center justify-center mx-auto mb-4">
               <CheckCircle className="w-8 h-8 text-success" />
             </div>
-            <h2 className="text-xl font-semibold mb-2 text-success">Purchase Successful!</h2>
+            <h2 className="text-xl font-semibold mb-2 text-success">Худалдан авалт амжилттай!</h2>
             <p className="text-muted-foreground mb-4">
-              You've successfully purchased {selectedMerchant?.item} from {selectedMerchant?.name}
+              Та {selectedMerchant?.name}-аас {selectedMerchant?.item} амжилттай худалдан авлаа
             </p>
             <p className="text-sm text-muted-foreground">
-              You'll receive payment reminders when installments are due
+              Төлбөрийн хуваарийн дагуу сануулга илгээх болно
             </p>
           </Card>
         </div>
@@ -78,15 +78,15 @@ export const SimpleBuy = () => {
 
   if (showQR && selectedMerchant) {
     return (
-      <Layout title="Simple Buy Payment">
+      <Layout title="Энгийн Худалдааны төлбөр">
         <div className="p-4">
           <Card className="p-6">
             <div className="text-center mb-6">
               <div className="w-16 h-16 bg-warning/10 rounded-full flex items-center justify-center mx-auto mb-4">
                 <QrCode className="w-8 h-8 text-warning" />
               </div>
-              <h2 className="text-xl font-semibold mb-2">Scan to Complete Purchase</h2>
-              <p className="text-muted-foreground">Present this QR code to the merchant</p>
+              <h2 className="text-xl font-semibold mb-2">Худалдан авалт дуусгах</h2>
+              <p className="text-muted-foreground">QR кодыг худалдагчид үзүүлнэ үү</p>
             </div>
 
             {/* Mock QR Code */}
@@ -101,25 +101,25 @@ export const SimpleBuy = () => {
             </div>
 
             <div className="space-y-3 mb-6">
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">Merchant</span>
+                <div className="flex justify-between">
+                <span className="text-muted-foreground">Худалдагч</span>
                 <span className="font-semibold">{selectedMerchant.name}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-muted-foreground">Item</span>
+                <span className="text-muted-foreground">Бүтээгдэхүүн</span>
                 <span className="font-semibold">{selectedMerchant.item}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-muted-foreground">Total Amount</span>
+                <span className="text-muted-foreground">Нийт дүн</span>
                 <span className="font-semibold">₮{selectedMerchant.price.toLocaleString()}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-muted-foreground">Monthly Payment</span>
+                <span className="text-muted-foreground">Сарын төлбөр</span>
                 <span className="font-semibold">₮{Math.round(selectedMerchant.price / 6).toLocaleString()}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-muted-foreground">Term</span>
-                <span className="font-semibold">6 months</span>
+                <span className="text-muted-foreground">Хугацаа</span>
+                <span className="font-semibold">6 сар</span>
               </div>
             </div>
 
@@ -128,19 +128,19 @@ export const SimpleBuy = () => {
                 onClick={handlePaymentComplete}
                 className="w-full"
               >
-                Merchant Confirmed Payment
+                Худалдагч төлбөр баталгаажуулсан
               </Button>
               <Button 
                 onClick={() => setShowQR(false)}
                 variant="outline"
                 className="w-full"
               >
-                Cancel
+                Цуцлах
               </Button>
             </div>
 
             <p className="text-xs text-muted-foreground text-center mt-4">
-              This is a demo QR code for testing Simple Buy functionality
+              Энэ бол Энгийн Худалдааны функцийг турших туршилтын QR код
             </p>
           </Card>
         </div>
@@ -149,43 +149,43 @@ export const SimpleBuy = () => {
   }
 
   return (
-    <Layout title="Simple Buy">
+    <Layout title="Энгийн Худалдаа">
       <div className="p-4 space-y-6">
         {/* Header */}
         <Card className="p-6 text-center">
           <div className="w-16 h-16 bg-warning/10 rounded-full flex items-center justify-center mx-auto mb-4">
             <ShoppingCart className="w-8 h-8 text-warning" />
           </div>
-          <h1 className="text-2xl font-bold mb-2">Simple Buy</h1>
-          <p className="text-muted-foreground">Buy now, pay later in easy installments</p>
+          <h1 className="text-2xl font-bold mb-2">Энгийн Худалдаа</h1>
+          <p className="text-muted-foreground">Одоо худалдан аваад дараа нь хуваан төлөөрэй</p>
           <Badge variant="secondary" className="mt-2 bg-warning/10 text-warning">
-            0% Interest for 6 months
+            6 сарын хугацаанд 0% хүү
           </Badge>
         </Card>
 
         {/* How it works */}
         <Card className="p-4">
-          <h3 className="font-semibold mb-3">How Simple Buy Works</h3>
+          <h3 className="font-semibold mb-3">Энгийн Худалдаа хэрхэн ажилладаг</h3>
           <div className="space-y-3 text-sm">
             <div className="flex gap-3">
               <div className="w-6 h-6 bg-primary text-primary-foreground rounded-full flex items-center justify-center text-xs font-bold">1</div>
               <div>
-                <div className="font-medium">Choose your purchase</div>
-                <div className="text-muted-foreground">Select an item from our partner merchants</div>
+                <div className="font-medium">Худалдан авах зүйлээ сонгоно</div>
+                <div className="text-muted-foreground">Манай хамтрагч худалдагчдаас бүтээгдэхүүн сонгоно</div>
               </div>
             </div>
             <div className="flex gap-3">
               <div className="w-6 h-6 bg-primary text-primary-foreground rounded-full flex items-center justify-center text-xs font-bold">2</div>
               <div>
-                <div className="font-medium">Show QR code</div>
-                <div className="text-muted-foreground">Present the QR code to complete purchase</div>
+                <div className="font-medium">QR код үзүүлнэ</div>
+                <div className="text-muted-foreground">Худалдан авалт дуусгахын тулд QR код үзүүлнэ</div>
               </div>
             </div>
             <div className="flex gap-3">
               <div className="w-6 h-6 bg-primary text-primary-foreground rounded-full flex items-center justify-center text-xs font-bold">3</div>
               <div>
-                <div className="font-medium">Pay in installments</div>
-                <div className="text-muted-foreground">Automatic monthly deductions</div>
+                <div className="font-medium">Хуваан төлнө</div>
+                <div className="text-muted-foreground">Автомат сарын суутгал</div>
               </div>
             </div>
           </div>

@@ -14,8 +14,8 @@ export const Landing = () => {
           <div className="w-20 h-20 bg-primary rounded-2xl flex items-center justify-center mx-auto mb-4">
             <span className="text-2xl font-bold text-primary-foreground">SL</span>
           </div>
-          <h1 className="text-3xl font-bold text-foreground mb-2">Simple Loan</h1>
-          <p className="text-lg text-muted-foreground">Fast, Easy, Secure Loans</p>
+          <h1 className="text-3xl font-bold text-foreground mb-2">Энгийн Зээл</h1>
+          <p className="text-lg text-muted-foreground">Хурдан, хялбар, найдвартай зээл</p>
         </div>
 
         {/* Features */}
@@ -26,8 +26,8 @@ export const Landing = () => {
                 <Zap className="w-5 h-5 text-primary" />
               </div>
               <div>
-                <h3 className="font-medium">Instant Approval</h3>
-                <p className="text-sm text-muted-foreground">Get approved in minutes</p>
+                <h3 className="font-medium">Шуурхай зөвшөөрөл</h3>
+                <p className="text-sm text-muted-foreground">Хэдхэн минутад зөвшөөрөгдөх</p>
               </div>
             </div>
           </Card>
@@ -38,8 +38,8 @@ export const Landing = () => {
                 <Clock className="w-5 h-5 text-primary" />
               </div>
               <div>
-                <h3 className="font-medium">Flexible Terms</h3>
-                <p className="text-sm text-muted-foreground">3-40 months repayment</p>
+                <h3 className="font-medium">Уян хатан нөхцөл</h3>
+                <p className="text-sm text-muted-foreground">3-40 сарын төлбөр</p>
               </div>
             </div>
           </Card>
@@ -50,8 +50,8 @@ export const Landing = () => {
                 <ShieldCheck className="w-5 h-5 text-primary" />
               </div>
               <div>
-                <h3 className="font-medium">100% Secure</h3>
-                <p className="text-sm text-muted-foreground">Bank-level security</p>
+                <h3 className="font-medium">100% Аюулгүй</h3>
+                <p className="text-sm text-muted-foreground">Банкны түвшний аюулгүй байдал</p>
               </div>
             </div>
           </Card>
@@ -63,14 +63,14 @@ export const Landing = () => {
             onClick={() => navigate("/apply")}
             className="w-full h-12 text-lg font-medium"
           >
-            Apply Now
+            Зээл хүсэх
           </Button>
           <Button 
             variant="outline"
             onClick={() => navigate("/login")}
             className="w-full h-12 text-lg font-medium"
           >
-            Login
+            Нэвтрэх
           </Button>
         </div>
 
@@ -80,13 +80,13 @@ export const Landing = () => {
             onClick={() => navigate("/faq")}
             className="text-muted-foreground hover:text-foreground"
           >
-            FAQ
+            Асуулт хариулт
           </button>
           <button 
             onClick={() => navigate("/support")}
             className="text-muted-foreground hover:text-foreground"
           >
-            Support
+            Тусламж
           </button>
         </div>
       </div>

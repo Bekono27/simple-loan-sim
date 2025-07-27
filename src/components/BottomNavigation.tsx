@@ -1,5 +1,5 @@
 import { useNavigate, useLocation } from "react-router-dom";
-import { Wallet, CreditCard, Settings, User } from "lucide-react";
+import { Wallet, CreditCard, ShoppingBag, User } from "lucide-react";
 
 interface NavItem {
   icon: any;
@@ -14,7 +14,7 @@ export const BottomNavigation = () => {
   const navItems: NavItem[] = [
     { icon: Wallet, label: "Хэтэвч", path: "/dashboard" },
     { icon: CreditCard, label: "Зээл", path: "/apply" },
-    { icon: Settings, label: "Үйлчилгээ", path: "/simple-buy" },
+    { icon: ShoppingBag, label: "Үйлчилгээ", path: "/simple-buy" },
     { icon: User, label: "Профайл", path: "/profile" },
   ];
 

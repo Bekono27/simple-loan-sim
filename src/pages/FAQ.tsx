@@ -5,44 +5,44 @@ import { HelpCircle } from "lucide-react";
 
 const faqData = [
   {
-    question: "How fast can I get my loan approved?",
-    answer: "Most loan applications are processed within 2-3 minutes. Once approved, funds are typically transferred to your account within 24 hours."
+    question: "Зээл хэр хурдан зөвшөөрөгдөх вэ?",
+    answer: "Ихэнх зээлийн хүсэлт 2-3 минутад боловсруулагддаг. Зөвшөөрөгдсөний дараа мөнгө ихэвчлэн 24 цагийн дотор таны дансанд шилжих болно."
   },
   {
-    question: "What are the interest rates?",
-    answer: "Our interest rates start from 15% annually, depending on your credit score and loan amount. We offer competitive rates with transparent pricing."
+    question: "Хүүгийн хэмжээ хэд вэ?",
+    answer: "Манай хүүгийн хэмжээ жилийн 15%-аас эхэлдэг бөгөөд таны зээлийн үнэлгээ болон зээлийн хэмжээнээс хамаарна. Бид ил тод үнэлгээтэй өрсөлдөхүйц хүү санал болгодог."
   },
   {
-    question: "What's the minimum and maximum loan amount?",
-    answer: "You can borrow from ₮100,000 to ₮10,000,000. The exact amount depends on your credit assessment and repayment capacity."
+    question: "Зээлийн хамгийн бага, хамгийн их хэмжээ хэд вэ?",
+    answer: "Та ₮100,000-аас ₮10,000,000 хүртэл зээл авч болно. Яг тодорхой дүн нь таны зээлийн үнэлгээ болон эргэн төлөх чадвараас хамаарна."
   },
   {
-    question: "How long are the repayment terms?",
-    answer: "We offer flexible repayment terms from 3 to 40 months. You can choose the term that best fits your budget."
+    question: "Эргэн төлөх хугацаа хэр урт вэ?",
+    answer: "Бид 3-аас 40 сар хүртэлх уян хатан эргэн төлөх хугацаа санал болгодог. Та өөрийн төсөвт тохирсон хугацааг сонгож болно."
   },
   {
-    question: "Is Simple Buy really interest-free?",
-    answer: "Yes! Simple Buy offers 0% interest for purchases paid within 6 months. No hidden fees or charges."
+    question: "Энгийн худалдаа үнэхээр хүүгүй юу?",
+    answer: "Тийм ээ! Энгийн худалдаа нь 6 сарын дотор төлсөн худалдан авалтад 0% хүү санал болгодог. Ямар ч нуугдмал төлбөр, хураамж байхгүй."
   },
   {
-    question: "How do I make repayments?",
-    answer: "You can make repayments through QPay QR codes, or we can set up automatic deductions from your bank account."
+    question: "Эргэн төлбөрийг хэрхэн төлөх вэ?",
+    answer: "Та QPay QR кодоор эргэн төлбөр хийх боломжтой, эсвэл бид таны банкны данснаас автоматаар суутгах тохиргоо хийж өгч болно."
   },
   {
-    question: "What happens if I miss a payment?",
-    answer: "We'll send you reminders before and after your due date. Late payments may incur additional fees, so we recommend setting up automatic payments."
+    question: "Төлбөр хоцорвол юу болох вэ?",
+    answer: "Бид төлбөрийн өдрөөс өмнө болон дараа нь танд сануулга илгээх болно. Хоцрогдсон төлбөрт нэмэлт хураамж ногдуулагдаж болзошгүй тул автомат төлбөр тохируулахыг зөвлөж байна."
   },
   {
-    question: "Can I pay off my loan early?",
-    answer: "Yes! You can pay off your loan early without any penalties. This can help you save on interest charges."
+    question: "Зээлээ эрт төлж болох уу?",
+    answer: "Тийм ээ! Та зээлээ ямар ч торгууль байхгүйгээр эрт төлж болно. Энэ нь хүүгийн төлбөр хэмнэхэд тусална."
   },
   {
-    question: "How is my credit score calculated?",
-    answer: "We use multiple factors including your payment history, income, existing debts, and banking behavior to calculate your credit score."
+    question: "Миний зээлийн үнэлгээ хэрхэн тооцогддог вэ?",
+    answer: "Бид таны төлбөрийн түүх, орлого, одоо байгаа өр, банкны үйл ажиллагаа зэрэг олон хүчин зүйлийг ашиглан таны зээлийн үнэлгээг тооцдог."
   },
   {
-    question: "Is my personal information secure?",
-    answer: "Absolutely. We use bank-level encryption and security measures to protect your personal and financial information."
+    question: "Миний хувийн мэдээлэл аюулгүй байна уу?",
+    answer: "Мэдээжийн хэрэг. Бид таны хувийн болон санхүүгийн мэдээллийг хамгаалахын тулд банкны түвшний шифрлэлт болон аюулгүйн арга хэмжээ ашигладаг."
   }
 ];
 
@@ -54,8 +54,8 @@ export const FAQ = () => {
           <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
             <HelpCircle className="w-8 h-8 text-primary" />
           </div>
-          <h1 className="text-2xl font-bold mb-2">Frequently Asked Questions</h1>
-          <p className="text-muted-foreground">Find answers to common questions about Simple Loan</p>
+          <h1 className="text-2xl font-bold mb-2">Асуулт хариулт</h1>
+          <p className="text-muted-foreground">Энгийн Зээлийн талаархи нийтлэг асуултын хариулт</p>
         </Card>
 
         <Card className="p-4">
@@ -74,14 +74,14 @@ export const FAQ = () => {
         </Card>
 
         <Card className="p-4 text-center">
-          <h3 className="font-semibold mb-2">Still have questions?</h3>
+          <h3 className="font-semibold mb-2">Асуулт байсаар байна уу?</h3>
           <p className="text-muted-foreground mb-3">
-            Our support team is here to help you 24/7
+            Манай тусламжийн баг танд 24/7 туслахад бэлэн байна
           </p>
           <div className="space-y-2 text-sm">
-            <div>📞 Support Hotline: 1800-SIMPLE</div>
-            <div>📧 Email: support@simpleloan.mn</div>
-            <div>💬 Live Chat: Available in app</div>
+            <div>📞 Тусламжийн утас: 1800-SIMPLE</div>
+            <div>📧 И-мэйл: support@simpleloan.mn</div>
+            <div>💬 Шууд чат: Апп дотор боломжтой</div>
           </div>
         </Card>
       </div>

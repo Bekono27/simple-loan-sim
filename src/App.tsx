@@ -11,6 +11,7 @@ import { Repayment } from "./pages/Repayment";
 import { SimpleBuy } from "./pages/SimpleBuy";
 import { FAQ } from "./pages/FAQ";
 import { Support } from "./pages/Support";
+import { Profile } from "./pages/Profile";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -30,6 +31,7 @@ const App = () => (
           <Route path="/simple-buy" element={<SimpleBuy />} />
           <Route path="/faq" element={<FAQ />} />
           <Route path="/support" element={<Support />} />
+          <Route path="/profile" element={<Profile />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
