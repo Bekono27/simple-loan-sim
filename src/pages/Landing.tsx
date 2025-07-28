@@ -60,10 +60,10 @@ export const Landing = () => {
         {/* CTA Buttons */}
         <div className="space-y-3">
           <Button 
-            onClick={() => navigate("/apply")}
+            onClick={() => navigate("/loan-eligibility")}
             className="w-full h-12 text-lg font-medium"
           >
-            Зээл хүсэх
+            Зээлийн чадвар шалгах
           </Button>
           <Button 
             variant="outline"

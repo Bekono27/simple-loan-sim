@@ -1,160 +1,156 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Layout } from "@/components/Layout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Card } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
-import { useToast } from "@/hooks/use-toast";
-import { Phone } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { toast } from "@/hooks/use-toast";
+import { ArrowLeft, User, Lock } from "lucide-react";
 
 export const Login = () => {
-  const [step, setStep] = useState<"phone" | "otp">("phone");
-  const [phone, setPhone] = useState("");
-  const [otp, setOtp] = useState("");
-  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
-  const { toast } = useToast();
+  const [formData, setFormData] = useState({
+    username: "",
+    password: ""
+  });
+  const [loading, setLoading] = useState(false);
 
-  const handlePhoneSubmit = async () => {
-    if (!phone || phone.length < 8) {
-      toast({
-        title: "Утасны дугаар буруу",
-        description: "Зөв утасны дугаар оруулна уу",
-        variant: "destructive"
-      });
-      return;
-    }
-
-    setLoading(true);
-    // Simulate API call
-    setTimeout(() => {
-      setStep("otp");
-      setLoading(false);
-      toast({
-        title: "Баталгаажуулах код илгээгдлээ!",
-        description: "Үргэлжлүүлэхийн тулд 1234 оруулна уу (жишээ)",
-      });
-    }, 1000);
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
   };
 
-  const handleOtpSubmit = async () => {
-    if (otp !== "1234") {
+  const handleLogin = async () => {
+    if (!formData.username || !formData.password) {
       toast({
-        title: "Баталгаажуулах код буруу",
-        description: "Зөв баталгаажуулах код оруулна уу (1234)",
+        title: "Алдаа",
+        description: "Хэрэглэгчийн нэр болон нууц үгээ оруулна уу",
         variant: "destructive"
       });
       return;
     }
 
     setLoading(true);
-    // Simulate login
+
+    // Simulate API call
     setTimeout(() => {
-      const userData = {
-        id: "1",
-        name: "Бат-Эрдэнэ",
-        phone: phone,
-        joinedDate: new Date().toISOString()
-      };
+      // Check if user exists in localStorage (simple simulation)
+      const existingUser = localStorage.getItem("currentUser");
       
-      localStorage.setItem("simple_loan_user", JSON.stringify(userData));
+      if (existingUser) {
+        const userData = JSON.parse(existingUser);
+        if (userData.username === formData.username) {
+          localStorage.setItem("isLoggedIn", "true");
+          toast({
+            title: "Амжилттай",
+            description: "Тавтай морилно уу!"
+          });
+          navigate("/dashboard");
+        } else {
+          toast({
+            title: "Алдаа",
+            description: "Хэрэглэгчийн нэр эсвэл нууц үг буруу байна",
+            variant: "destructive"
+          });
+        }
+      } else {
+        toast({
+          title: "Алдаа", 
+          description: "Бүртгэлгүй хэрэглэгч байна. Эхлээд бүртгүүлнэ үү",
+          variant: "destructive"
+        });
+      }
+      
       setLoading(false);
-      
-      toast({
-        title: "Тавтай морилно уу!",
-        description: "Амжилттай нэвтэрлээ",
-      });
-      
-      navigate("/dashboard");
     }, 1000);
   };
 
   return (
-    <Layout title="Нэвтрэх" showBottomNav={false}>
-      <div className="p-4">
-        <Card className="p-6">
-          {step === "phone" ? (
-            <div className="space-y-6">
-              <div className="text-center">
-                <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <Phone className="w-8 h-8 text-primary" />
-                </div>
-                <h2 className="text-xl font-semibold mb-2">Утасны дугаараа оруулна уу</h2>
-                <p className="text-muted-foreground">Бид танд баталгаажуулах код илгээх болно</p>
-              </div>
+    <div className="min-h-screen bg-gradient-to-b from-primary/5 to-background">
+      <div className="max-w-md mx-auto px-4 py-8">
+        {/* Header */}
+        <div className="flex items-center gap-4 mb-8">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => navigate("/")}
+            className="rounded-full"
+          >
+            <ArrowLeft className="w-5 h-5" />
+          </Button>
+          <h1 className="text-2xl font-bold">Нэвтрэх</h1>
+        </div>
 
-              <div className="space-y-3">
-                <Label htmlFor="phone">Утасны дугаар</Label>
-                <div className="flex">
-                  <div className="flex items-center px-3 bg-muted border border-r-0 rounded-l-md">
-                    <span className="text-sm">+976</span>
-                  </div>
-                  <Input
-                    id="phone"
-                    type="tel"
-                    placeholder="88001234"
-                    value={phone}
-                    onChange={(e) => setPhone(e.target.value)}
-                    className="rounded-l-none"
-                  />
-                </div>
-              </div>
-
-              <Button 
-                onClick={handlePhoneSubmit}
-                disabled={loading}
-                className="w-full"
-              >
-                {loading ? "Илгээж байна..." : "Код илгээх"}
-              </Button>
-            </div>
-          ) : (
-            <div className="space-y-6">
-              <div className="text-center">
-                <h2 className="text-xl font-semibold mb-2">Баталгаажуулах код оруулна уу</h2>
-                <p className="text-muted-foreground">
-                  +976 {phone} дугаарт код илгээгдлээ
-                </p>
-              </div>
-
-              <div className="space-y-3">
-                <Label htmlFor="otp">Баталгаажуулах код</Label>
+        <Card className="neu-card">
+          <CardHeader>
+            <CardTitle className="text-center">Дансанд нэвтрэх</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {/* Username */}
+            <div>
+              <Label htmlFor="username">Хэрэглэгчийн нэр</Label>
+              <div className="relative">
+                <User className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                 <Input
-                  id="otp"
-                  type="text"
-                  placeholder="1234"
-                  value={otp}
-                  onChange={(e) => setOtp(e.target.value)}
-                  maxLength={4}
-                  className="text-center text-lg tracking-widest"
+                  id="username"
+                  name="username"
+                  value={formData.username}
+                  onChange={handleInputChange}
+                  placeholder="Хэрэглэгчийн нэр"
+                  className="pl-10"
                 />
-                <p className="text-xs text-muted-foreground text-center">
-                  Жишээ: Үргэлжлүүлэхийн тулд 1234 оруулна уу
-                </p>
-              </div>
-
-              <div className="space-y-3">
-                <Button 
-                  onClick={handleOtpSubmit}
-                  disabled={loading}
-                  className="w-full"
-                >
-                  {loading ? "Шалгаж байна..." : "Баталгаажуулаад нэвтрэх"}
-                </Button>
-                
-                <Button 
-                  variant="ghost"
-                  onClick={() => setStep("phone")}
-                  className="w-full"
-                >
-                  Утасны дугаар солих
-                </Button>
               </div>
             </div>
-          )}
+
+            {/* Password */}
+            <div>
+              <Label htmlFor="password">Нууц үг</Label>
+              <div className="relative">
+                <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                <Input
+                  id="password"
+                  name="password"
+                  type="password"
+                  value={formData.password}
+                  onChange={handleInputChange}
+                  placeholder="••••••••"
+                  className="pl-10"
+                />
+              </div>
+            </div>
+
+            {/* Login Button */}
+            <Button
+              onClick={handleLogin}
+              disabled={loading}
+              className="w-full h-12 text-lg"
+            >
+              {loading ? "Нэвтэрч байна..." : "Нэвтрэх"}
+            </Button>
+
+            {/* Divider */}
+            <div className="text-center">
+              <span className="text-muted-foreground">эсвэл</span>
+            </div>
+
+            {/* Signup Button */}
+            <Button
+              variant="outline"
+              onClick={() => navigate("/signup")}
+              className="w-full h-12 text-lg"
+            >
+              Шинэ данс үүсгэх
+            </Button>
+
+            {/* Forgot Password */}
+            <div className="text-center">
+              <button className="text-sm text-muted-foreground hover:text-foreground">
+                Нууц үг мартсан уу?
+              </button>
+            </div>
+          </CardContent>
         </Card>
       </div>
-    </Layout>
+    </div>
   );
 };

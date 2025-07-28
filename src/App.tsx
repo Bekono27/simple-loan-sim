@@ -5,8 +5,12 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { Landing } from "./pages/Landing";
 import { Login } from "./pages/Login";
+import { Signup } from "./pages/Signup";
 import { Dashboard } from "./pages/Dashboard";
 import { LoanApplication } from "./pages/LoanApplication";
+import { LoanEligibility } from "./pages/LoanEligibility";
+import { LoanPayment } from "./pages/LoanPayment";
+import { LoanResult } from "./pages/LoanResult";
 import { Repayment } from "./pages/Repayment";
 import { SimpleBuy } from "./pages/SimpleBuy";
 import { FAQ } from "./pages/FAQ";
@@ -25,8 +29,12 @@ const App = () => (
         <Routes>
           <Route path="/" element={<Landing />} />
           <Route path="/login" element={<Login />} />
+          <Route path="/signup" element={<Signup />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/apply" element={<LoanApplication />} />
+          <Route path="/loan-eligibility" element={<LoanEligibility />} />
+          <Route path="/loan-payment" element={<LoanPayment />} />
+          <Route path="/loan-result" element={<LoanResult />} />
           <Route path="/repay" element={<Repayment />} />
           <Route path="/simple-buy" element={<SimpleBuy />} />
           <Route path="/faq" element={<FAQ />} />

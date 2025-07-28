@@ -30,8 +30,10 @@ export const Dashboard = () => {
   });
 
   useEffect(() => {
-    const userData = localStorage.getItem("simple_loan_user");
-    if (!userData) {
+    const userData = localStorage.getItem("currentUser");
+    const isLoggedIn = localStorage.getItem("isLoggedIn");
+    
+    if (!userData || !isLoggedIn) {
       navigate("/login");
       return;
     }
@@ -39,9 +41,15 @@ export const Dashboard = () => {
     setUser(JSON.parse(userData));
     
     // Load loan data from localStorage
-    const savedLoanData = localStorage.getItem("simple_loan_data");
+    const savedLoanData = localStorage.getItem("loanApplication");
     if (savedLoanData) {
-      setLoanData(JSON.parse(savedLoanData));
+      const loanApp = JSON.parse(savedLoanData);
+      if (loanApp.status === "completed" && loanApp.result) {
+        setLoanData({
+          creditScore: loanApp.result.score || 750,
+          totalPaid: 0
+        });
+      }
     }
   }, [navigate]);
 
@@ -109,7 +117,7 @@ export const Dashboard = () => {
         {/* Quick Actions */}
         <div className="grid grid-cols-2 gap-3">
           <Button 
-            onClick={() => navigate("/apply")}
+            onClick={() => navigate("/loan-eligibility")}
             className="financial-card h-16 p-4 text-white border-0 relative overflow-hidden"
           >
             <div className="absolute inset-0 bg-gradient-to-br from-primary to-primary-light"></div>
@@ -118,8 +126,8 @@ export const Dashboard = () => {
                 <ArrowUpRight className="w-4 h-4" />
               </div>
               <div className="text-left">
-                <p className="font-semibold text-sm">Орлого нэмэх</p>
-                <p className="text-xs opacity-80">Зээл авах</p>
+                <p className="font-semibold text-sm">Зээлийн чадвар</p>
+                <p className="text-xs opacity-80">Шалгах</p>
               </div>
             </div>
           </Button>
