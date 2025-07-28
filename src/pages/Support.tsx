@@ -23,8 +23,8 @@ export const Support = () => {
     
     if (!formData.name || !formData.email || !formData.message) {
       toast({
-        title: "Missing information",
-        description: "Please fill in all required fields",
+        title: "Мэдээлэл дутуу байна",
+        description: "Шаардлагатай талбаруудыг бөглөнө үү",
         variant: "destructive"
       });
       return;
@@ -32,8 +32,8 @@ export const Support = () => {
 
     setSubmitted(true);
     toast({
-      title: "Message sent!",
-      description: "We'll get back to you within 24 hours",
+      title: "Мессеж илгээгдлээ!",
+      description: "Бид 24 цагийн дотор хариулах болно",
     });
 
     setTimeout(() => {
@@ -48,18 +48,18 @@ export const Support = () => {
 
   if (submitted) {
     return (
-      <Layout title="Support">
+      <Layout title="Тусламж">
         <div className="p-4">
           <Card className="p-8 text-center">
             <div className="w-16 h-16 bg-success/10 rounded-full flex items-center justify-center mx-auto mb-4">
               <CheckCircle className="w-8 h-8 text-success" />
             </div>
-            <h2 className="text-xl font-semibold mb-2 text-success">Message Sent!</h2>
+            <h2 className="text-xl font-semibold mb-2 text-success">Мессеж илгээгдлээ!</h2>
             <p className="text-muted-foreground mb-4">
-              Thank you for contacting us. Our support team will respond within 24 hours.
+              Бидэнтэй холбогдсонд баярлалаа. Манай тусламжийн баг 24 цагийн дотор хариулах болно.
             </p>
             <p className="text-sm text-muted-foreground">
-              You'll receive a confirmation email shortly.
+              Удахгүй баталгаажуулах имэйл хүлээн авах болно.
             </p>
           </Card>
         </div>
@@ -68,19 +68,19 @@ export const Support = () => {
   }
 
   return (
-    <Layout title="Support">
+    <Layout title="Тусламж">
       <div className="p-4 space-y-6">
         <Card className="p-6 text-center">
           <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
             <MessageCircle className="w-8 h-8 text-primary" />
           </div>
-          <h1 className="text-2xl font-bold mb-2">Get Support</h1>
-          <p className="text-muted-foreground">We're here to help you with any questions or issues</p>
+          <h1 className="text-2xl font-bold mb-2">Тусламж авах</h1>
+          <p className="text-muted-foreground">Бид таны асуулт болон асуудалд туслахад бэлэн байна</p>
         </Card>
 
         {/* Contact Methods */}
         <div className="space-y-3">
-          <h3 className="font-semibold">Contact Us</h3>
+          <h3 className="font-semibold">Бидэнтэй холбогдох</h3>
           
           <Card className="p-4">
             <div className="flex items-center gap-3">
@@ -88,7 +88,7 @@ export const Support = () => {
                 <Phone className="w-5 h-5 text-primary" />
               </div>
               <div>
-                <div className="font-medium">Phone Support</div>
+                <div className="font-medium">Утасны тусламж</div>
                 <div className="text-sm text-muted-foreground">1800-SIMPLE (24/7)</div>
               </div>
             </div>
@@ -100,7 +100,7 @@ export const Support = () => {
                 <Mail className="w-5 h-5 text-primary" />
               </div>
               <div>
-                <div className="font-medium">Email Support</div>
+                <div className="font-medium">Имэйл тусламж</div>
                 <div className="text-sm text-muted-foreground">support@simpleloan.mn</div>
               </div>
             </div>
@@ -112,8 +112,8 @@ export const Support = () => {
                 <Clock className="w-5 h-5 text-primary" />
               </div>
               <div>
-                <div className="font-medium">Response Time</div>
-                <div className="text-sm text-muted-foreground">Within 24 hours</div>
+                <div className="font-medium">Хариу өгөх хугацаа</div>
+                <div className="text-sm text-muted-foreground">24 цагийн дотор</div>
               </div>
             </div>
           </Card>
@@ -121,80 +121,80 @@ export const Support = () => {
 
         {/* Contact Form */}
         <Card className="p-6">
-          <h3 className="font-semibold mb-4">Send us a message</h3>
+          <h3 className="font-semibold mb-4">Бидэнд мессеж илгээх</h3>
           
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <Label htmlFor="name">Name *</Label>
+                <Label htmlFor="name">Нэр *</Label>
                 <Input
                   id="name"
                   value={formData.name}
                   onChange={(e) => handleChange("name", e.target.value)}
-                  placeholder="Your name"
+                  placeholder="Таны нэр"
                   required
                 />
               </div>
               <div>
-                <Label htmlFor="email">Email *</Label>
+                <Label htmlFor="email">Имэйл *</Label>
                 <Input
                   id="email"
                   type="email"
                   value={formData.email}
                   onChange={(e) => handleChange("email", e.target.value)}
-                  placeholder="your@email.com"
+                  placeholder="таны@имэйл.com"
                   required
                 />
               </div>
             </div>
 
             <div>
-              <Label htmlFor="subject">Subject</Label>
+              <Label htmlFor="subject">Гарчиг</Label>
               <Input
                 id="subject"
                 value={formData.subject}
                 onChange={(e) => handleChange("subject", e.target.value)}
-                placeholder="Brief description of your issue"
+                placeholder="Таны асуудлын товч тодорхойлолт"
               />
             </div>
 
             <div>
-              <Label htmlFor="message">Message *</Label>
+              <Label htmlFor="message">Мессеж *</Label>
               <Textarea
                 id="message"
                 value={formData.message}
                 onChange={(e) => handleChange("message", e.target.value)}
-                placeholder="Please describe your issue or question in detail..."
+                placeholder="Таны асуудал эсвэл асуултыг дэлгэрэнгүй бичнэ үү..."
                 rows={4}
                 required
               />
             </div>
 
             <Button type="submit" className="w-full">
-              Send Message
+              Мессеж илгээх
             </Button>
           </form>
         </Card>
 
         {/* Common Issues */}
         <Card className="p-4">
-          <h3 className="font-semibold mb-3">Common Issues</h3>
+          <h3 className="font-semibold mb-3">Түгээмэл асуудлууд</h3>
           <div className="space-y-2 text-sm">
             <div className="flex justify-between items-center py-2 border-b border-border">
-              <span>Loan application status</span>
-              <span className="text-muted-foreground">Check dashboard</span>
+              <span>Зээлийн хүсэлтийн төлөв</span>
+              <span className="text-muted-foreground">Хяналтын самбарт шалгах</span>
             </div>
             <div className="flex justify-between items-center py-2 border-b border-border">
-              <span>Payment not processed</span>
-              <span className="text-muted-foreground">24-48 hours</span>
+              <span>Төлбөр боловсруулагдаагүй</span>
+              <span className="text-muted-foreground">24-48 цаг</span>
             </div>
             <div className="flex justify-between items-center py-2 border-b border-border">
-              <span>Update personal information</span>
-              <span className="text-muted-foreground">Contact support</span>
+              <span>Хувийн мэдээлэл шинэчлэх</span>
+              <span className="text-muted-foreground">Тусламжтай холбогдох</span>
             </div>
             <div className="flex justify-between items-center py-2">
-              <span>Technical issues</span>
-              <span className="text-muted-foreground">Report via form</span>
+              <span>Техникийн асуудал</span>
+              <span className="text-muted-foreground">Маягтаар мэдэгдэх</span>
             </div>
           </div>
         </Card>

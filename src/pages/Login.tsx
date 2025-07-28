@@ -19,8 +19,8 @@ export const Login = () => {
   const handlePhoneSubmit = async () => {
     if (!phone || phone.length < 8) {
       toast({
-        title: "Invalid phone number",
-        description: "Please enter a valid phone number",
+        title: "Утасны дугаар буруу",
+        description: "Зөв утасны дугаар оруулна уу",
         variant: "destructive"
       });
       return;
@@ -32,8 +32,8 @@ export const Login = () => {
       setStep("otp");
       setLoading(false);
       toast({
-        title: "OTP sent!",
-        description: "Enter 1234 to continue (demo)",
+        title: "Баталгаажуулах код илгээгдлээ!",
+        description: "Үргэлжлүүлэхийн тулд 1234 оруулна уу (жишээ)",
       });
     }, 1000);
   };
@@ -41,8 +41,8 @@ export const Login = () => {
   const handleOtpSubmit = async () => {
     if (otp !== "1234") {
       toast({
-        title: "Invalid OTP",
-        description: "Please enter the correct OTP (1234)",
+        title: "Баталгаажуулах код буруу",
+        description: "Зөв баталгаажуулах код оруулна уу (1234)",
         variant: "destructive"
       });
       return;
@@ -53,7 +53,7 @@ export const Login = () => {
     setTimeout(() => {
       const userData = {
         id: "1",
-        name: "John Doe",
+        name: "Бат-Эрдэнэ",
         phone: phone,
         joinedDate: new Date().toISOString()
       };
@@ -62,8 +62,8 @@ export const Login = () => {
       setLoading(false);
       
       toast({
-        title: "Welcome back!",
-        description: "Login successful",
+        title: "Тавтай морилно уу!",
+        description: "Амжилттай нэвтэрлээ",
       });
       
       navigate("/dashboard");
@@ -80,12 +80,12 @@ export const Login = () => {
                 <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
                   <Phone className="w-8 h-8 text-primary" />
                 </div>
-                <h2 className="text-xl font-semibold mb-2">Enter your phone number</h2>
-                <p className="text-muted-foreground">We'll send you a verification code</p>
+                <h2 className="text-xl font-semibold mb-2">Утасны дугаараа оруулна уу</h2>
+                <p className="text-muted-foreground">Бид танд баталгаажуулах код илгээх болно</p>
               </div>
 
               <div className="space-y-3">
-                <Label htmlFor="phone">Phone Number</Label>
+                <Label htmlFor="phone">Утасны дугаар</Label>
                 <div className="flex">
                   <div className="flex items-center px-3 bg-muted border border-r-0 rounded-l-md">
                     <span className="text-sm">+976</span>
@@ -106,20 +106,20 @@ export const Login = () => {
                 disabled={loading}
                 className="w-full"
               >
-                {loading ? "Sending..." : "Send OTP"}
+                {loading ? "Илгээж байна..." : "Код илгээх"}
               </Button>
             </div>
           ) : (
             <div className="space-y-6">
               <div className="text-center">
-                <h2 className="text-xl font-semibold mb-2">Enter verification code</h2>
+                <h2 className="text-xl font-semibold mb-2">Баталгаажуулах код оруулна уу</h2>
                 <p className="text-muted-foreground">
-                  Code sent to +976 {phone}
+                  +976 {phone} дугаарт код илгээгдлээ
                 </p>
               </div>
 
               <div className="space-y-3">
-                <Label htmlFor="otp">Verification Code</Label>
+                <Label htmlFor="otp">Баталгаажуулах код</Label>
                 <Input
                   id="otp"
                   type="text"
@@ -130,7 +130,7 @@ export const Login = () => {
                   className="text-center text-lg tracking-widest"
                 />
                 <p className="text-xs text-muted-foreground text-center">
-                  Demo: Enter 1234 to continue
+                  Жишээ: Үргэлжлүүлэхийн тулд 1234 оруулна уу
                 </p>
               </div>
 
@@ -140,7 +140,7 @@ export const Login = () => {
                   disabled={loading}
                   className="w-full"
                 >
-                  {loading ? "Verifying..." : "Verify & Login"}
+                  {loading ? "Шалгаж байна..." : "Баталгаажуулаад нэвтрэх"}
                 </Button>
                 
                 <Button 
@@ -148,7 +148,7 @@ export const Login = () => {
                   onClick={() => setStep("phone")}
                   className="w-full"
                 >
-                  Change phone number
+                  Утасны дугаар солих
                 </Button>
               </div>
             </div>
