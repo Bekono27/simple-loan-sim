@@ -8,22 +8,33 @@ export const PaymentMethods = () => {
       name: "Банкны шилжүүлэг",
       icon: Building2,
       description: "Дансны дугаараар шууд шилжүүлэг",
-      advantages: ["Найдвартай", "Бүх банктай холбогдоно", "Админы баталгаажуулалт"],
-      recommended: true
+      advantages: ["Найдвартай", "Лавлах код шаардлагатай", "Админы баталгаажуулалт"],
+      recommended: true,
+      available: true
     },
     {
-      name: "QPay / QR код",
+      name: "QR код",
       icon: QrCode,
-      description: "Цахим төлбөрийн систем",
+      description: "QR код ашиглан төлбөр",
+      advantages: ["Хурдан", "Аюулгүй", "Лавлах код шаардлагатай"],
+      recommended: false,
+      available: true
+    },
+    {
+      name: "QPay",
+      icon: Smartphone,
+      description: "QPay апп-аар төлбөр",
       advantages: ["Хурдан", "Аюулгүй", "Тун удахгүй"],
-      recommended: false
+      recommended: false,
+      available: false
     },
     {
       name: "Visa карт",
       icon: CreditCard,
       description: "Кредит картаар төлбөр",
       advantages: ["Олон улсын карт", "Хурдан", "Тун удахгүй"],
-      recommended: false
+      recommended: false,
+      available: false
     }
   ];
 
@@ -34,19 +45,22 @@ export const PaymentMethods = () => {
       {paymentMethods.map((method) => {
         const Icon = method.icon;
         return (
-          <Card key={method.name} className={`${method.recommended ? 'border-primary' : ''}`}>
+          <Card key={method.name} className={`${method.recommended ? 'border-primary' : ''} ${!method.available ? 'opacity-60' : ''}`}>
             <CardHeader className="pb-3">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center">
-                    <Icon className="w-5 h-5 text-primary" />
+                  <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${method.available ? 'bg-primary/10' : 'bg-muted'}`}>
+                    <Icon className={`w-5 h-5 ${method.available ? 'text-primary' : 'text-muted-foreground'}`} />
                   </div>
                   <div>
-                    <CardTitle className="text-base">{method.name}</CardTitle>
+                    <CardTitle className="text-base flex items-center gap-2">
+                      {method.name}
+                      {!method.available && <Badge variant="secondary" className="text-xs">Тун удахгүй</Badge>}
+                    </CardTitle>
                     <p className="text-sm text-muted-foreground">{method.description}</p>
                   </div>
                 </div>
-                {method.recommended && (
+                {method.recommended && method.available && (
                   <Badge className="bg-green-100 text-green-800">Санал болгож байна</Badge>
                 )}
               </div>
@@ -67,13 +81,13 @@ export const PaymentMethods = () => {
       <div className="bg-muted/50 p-4 rounded-lg">
         <h4 className="font-medium mb-2">Төлбөрийн аргын талаарх зөвлөгөө:</h4>
         <ul className="text-sm text-muted-foreground space-y-1">
-          <li>• <strong>Банкны шилжүүлэг</strong> - Одоо боломжтой, админы баталгаажуулалт</li>
-          <li>• <strong>QPay</strong> - Тун удахгүй нэмэгдэнэ</li>
-          <li>• <strong>Visa карт</strong> - Тун удахгүй нэмэгдэнэ</li>
+          <li>• <strong>Банкны шилжүүлэг</strong> - Одоо боломжтой, лавлах код заавал</li>
+          <li>• <strong>QR код</strong> - Одоо боломжтай, лавлах код заавал</li>
+          <li>• <strong>QPay & Visa</strong> - Тун удахгүй нэмэгдэнэ</li>
         </ul>
         <div className="mt-3 p-3 bg-blue-50 rounded-lg">
           <p className="text-xs text-blue-700">
-            <strong>Админы баталгаажуулалт:</strong> Банкны шилжүүлгийн төлбөрийг админ 24 цагийн дотор шалгаж баталгаажуулна.
+            <strong>Админы баталгаажуулалт:</strong> Төлбөрийг админ 30 минут - 1.5 цагийн дотор шалгаж баталгаажуулна.
           </p>
         </div>
       </div>

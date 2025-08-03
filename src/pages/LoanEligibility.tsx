@@ -154,7 +154,7 @@ export const LoanEligibility = () => {
               <AlertTriangle className="w-5 h-5 text-warning mt-0.5" />
               <div className="text-sm">
                 <p className="font-medium mb-1">Анхааруулга</p>
-                <p>Энэ шинжилгээ нь зөвхөн мэдээллийн зорилготой. Бид зээл олгодоггүй.</p>
+                <p>Энэ шинжилгээ нь зөвхөн мэдээллийн зорилготой.</p>
               </div>
             </div>
           </CardContent>
@@ -176,7 +176,7 @@ export const LoanEligibility = () => {
                 className="text-right text-lg"
               />
               <p className="text-sm text-muted-foreground mt-1">
-                Хамгийн бага: 300,000₮ • Хүү: 2.1% (долоо хоног тутам)
+                Хамгийн бага: 50,000₮ • Хүү: 2.1% (долоо хоног тутам)
               </p>
             </div>
 
@@ -239,7 +239,7 @@ export const LoanEligibility = () => {
               <ul className="space-y-2 text-sm text-muted-foreground">
                 <li className="flex items-center gap-2">
                   <div className="w-1.5 h-1.5 bg-primary rounded-full"></div>
-                  18-65 насны иргэн
+                  16-65 насны иргэн
                 </li>
                 <li className="flex items-center gap-2">
                   <div className="w-1.5 h-1.5 bg-primary rounded-full"></div>
