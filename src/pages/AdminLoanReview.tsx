@@ -4,6 +4,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 import { CheckCircle, XCircle, FileText, Eye, ArrowLeft, Download, User } from "lucide-react";
@@ -31,6 +33,8 @@ export const AdminLoanReview = () => {
   const [loading, setLoading] = useState(true);
   const [selectedLoan, setSelectedLoan] = useState<LoanApplication | null>(null);
   const [adminNotes, setAdminNotes] = useState("");
+  const [approvedAmount, setApprovedAmount] = useState("");
+  const [interestRate, setInterestRate] = useState("");
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -79,17 +83,23 @@ export const AdminLoanReview = () => {
     }
   };
 
-  const updateLoanStatus = async (loanId: string, status: 'approved' | 'rejected', notes: string) => {
+  const updateLoanStatus = async (loanId: string, status: 'approved' | 'rejected', notes: string, maxAmount?: number, interestRate?: number) => {
     try {
-      const { data: { user } } = await supabase.auth.getUser();
+      const updateData: any = {
+        status,
+        eligibility_result: notes,
+        updated_at: new Date().toISOString()
+      };
+
+      // If approved, add loan details
+      if (status === 'approved' && maxAmount && interestRate) {
+        updateData.max_loan_amount = maxAmount;
+        updateData.interest_rate = interestRate;
+      }
       
       const { error } = await supabase
         .from('loan_applications')
-        .update({
-          status,
-          eligibility_result: notes,
-          updated_at: new Date().toISOString()
-        })
+        .update(updateData)
         .eq('id', loanId);
 
       if (error) throw error;
@@ -102,6 +112,8 @@ export const AdminLoanReview = () => {
       fetchLoans();
       setSelectedLoan(null);
       setAdminNotes("");
+      setApprovedAmount("");
+      setInterestRate("");
     } catch (error) {
       console.error('Error updating loan:', error);
       toast({
@@ -236,6 +248,8 @@ export const AdminLoanReview = () => {
                     onClick={() => {
                       setSelectedLoan(loan);
                       setAdminNotes(loan.eligibility_result || "");
+                      setApprovedAmount(loan.amount.toString());
+                      setInterestRate("15");
                     }}
                     className="flex-1"
                   >
@@ -312,8 +326,32 @@ export const AdminLoanReview = () => {
                   value={adminNotes}
                   onChange={(e) => setAdminNotes(e.target.value)}
                   placeholder="Факт зээлийн хүсэлтийн талаарх тайлбар бичих..."
-                  rows={4}
+                  rows={3}
                 />
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="approvedAmount">Зөвшөөрөх дүн (₮)</Label>
+                  <Input
+                    id="approvedAmount"
+                    type="number"
+                    value={approvedAmount}
+                    onChange={(e) => setApprovedAmount(e.target.value)}
+                    placeholder="Зөвшөөрөх зээлийн дүн"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="interestRate">Хүүгийн хэмжээ (%)</Label>
+                  <Input
+                    id="interestRate"
+                    type="number"
+                    step="0.1"
+                    value={interestRate}
+                    onChange={(e) => setInterestRate(e.target.value)}
+                    placeholder="Жилийн хүү"
+                  />
+                </div>
               </div>
 
               <div className="flex gap-2">
@@ -323,6 +361,8 @@ export const AdminLoanReview = () => {
                   onClick={() => {
                     setSelectedLoan(null);
                     setAdminNotes("");
+                    setApprovedAmount("");
+                    setInterestRate("");
                   }}
                 >
                   Цуцлах
@@ -337,7 +377,19 @@ export const AdminLoanReview = () => {
                 </Button>
                 <Button
                   className="flex-1"
-                  onClick={() => updateLoanStatus(selectedLoan.id, 'approved', adminNotes)}
+                  onClick={() => {
+                    const amount = parseFloat(approvedAmount);
+                    const rate = parseFloat(interestRate);
+                    if (!amount || !rate) {
+                      toast({
+                        title: "Алдаа",
+                        description: "Зөвшөөрөх дүн болон хүүгийн хэмжээг оруулна уу",
+                        variant: "destructive"
+                      });
+                      return;
+                    }
+                    updateLoanStatus(selectedLoan.id, 'approved', adminNotes, amount, rate);
+                  }}
                 >
                   <CheckCircle className="w-4 h-4 mr-1" />
                   Зөвшөөрөх

@@ -10,6 +10,7 @@ import { CheckCircle, XCircle, Clock, Eye } from "lucide-react";
 interface PaymentVerification {
   id: string;
   user_id: string;
+  loan_application_id?: string;
   payment_method: string;
   reference_number: string;
   amount: number;
@@ -54,7 +55,8 @@ export const AdminPayments = () => {
     try {
       const { data: { user } } = await supabase.auth.getUser();
       
-      const { error } = await supabase
+      // Update payment verification status
+      const { error: paymentError } = await supabase
         .from('payment_verifications')
         .update({
           status,
@@ -64,7 +66,41 @@ export const AdminPayments = () => {
         })
         .eq('id', paymentId);
 
-      if (error) throw error;
+      if (paymentError) throw paymentError;
+
+      // If payment is verified, also update the loan application status
+      if (status === 'verified') {
+        const payment = payments.find(p => p.id === paymentId);
+        if (payment?.loan_application_id) {
+          const { error: loanError } = await supabase
+            .from('loan_applications')
+            .update({
+              payment_status: 'paid',
+              status: 'payment_verified'
+            })
+            .eq('id', payment.loan_application_id);
+
+          if (loanError) {
+            console.error('Error updating loan application:', loanError);
+          }
+        }
+      } else if (status === 'rejected') {
+        // If payment is rejected, update loan application to rejected
+        const payment = payments.find(p => p.id === paymentId);
+        if (payment?.loan_application_id) {
+          const { error: loanError } = await supabase
+            .from('loan_applications')
+            .update({
+              payment_status: 'rejected',
+              status: 'payment_rejected'
+            })
+            .eq('id', payment.loan_application_id);
+
+          if (loanError) {
+            console.error('Error updating loan application:', loanError);
+          }
+        }
+      }
 
       toast({
         title: "Амжилттай",
