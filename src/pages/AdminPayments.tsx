@@ -3,9 +3,11 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
-import { CheckCircle, XCircle, Clock, Eye } from "lucide-react";
+import { CheckCircle, XCircle, Clock, Eye, Search, Copy, User, Phone, CreditCard, Calendar, Hash } from "lucide-react";
 
 interface PaymentVerification {
   id: string;
@@ -18,27 +20,58 @@ interface PaymentVerification {
   payment_date: string;
   admin_notes?: string;
   created_at: string;
+  profiles?: {
+    full_name?: string;
+    phone_number?: string;
+    register_number?: string;
+    email?: string;
+  } | null;
 }
 
 export const AdminPayments = () => {
   const [payments, setPayments] = useState<PaymentVerification[]>([]);
+  const [filteredPayments, setFilteredPayments] = useState<PaymentVerification[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedPayment, setSelectedPayment] = useState<PaymentVerification | null>(null);
   const [adminNotes, setAdminNotes] = useState("");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [statusFilter, setStatusFilter] = useState("all");
 
   useEffect(() => {
     fetchPayments();
   }, []);
 
+  useEffect(() => {
+    filterPayments();
+  }, [payments, searchQuery, statusFilter]);
+
   const fetchPayments = async () => {
     try {
-      const { data, error } = await supabase
+      // First fetch payment verifications
+      const { data: paymentsData, error: paymentsError } = await supabase
         .from('payment_verifications')
         .select('*')
         .order('created_at', { ascending: false });
 
-      if (error) throw error;
-      setPayments(data || []);
+      if (paymentsError) throw paymentsError;
+
+      // Then fetch user profiles separately and merge
+      const enrichedPayments = await Promise.all(
+        (paymentsData || []).map(async (payment) => {
+          const { data: profile } = await supabase
+            .from('profiles')
+            .select('full_name, phone_number, register_number, email')
+            .eq('user_id', payment.user_id)
+            .maybeSingle();
+
+          return {
+            ...payment,
+            profiles: profile
+          };
+        })
+      );
+
+      setPayments(enrichedPayments);
     } catch (error) {
       console.error('Error fetching payments:', error);
       toast({
@@ -49,6 +82,36 @@ export const AdminPayments = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const filterPayments = () => {
+    let filtered = payments;
+
+    // Filter by search query (reference number, user name, phone)
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase();
+      filtered = filtered.filter(payment => 
+        payment.reference_number.toLowerCase().includes(query) ||
+        payment.profiles?.full_name?.toLowerCase().includes(query) ||
+        payment.profiles?.phone_number?.includes(query) ||
+        payment.profiles?.register_number?.includes(query)
+      );
+    }
+
+    // Filter by status
+    if (statusFilter !== 'all') {
+      filtered = filtered.filter(payment => payment.status === statusFilter);
+    }
+
+    setFilteredPayments(filtered);
+  };
+
+  const copyToClipboard = (text: string) => {
+    navigator.clipboard.writeText(text);
+    toast({
+      title: "Хуулагдлаа",
+      description: "Буферт хадгалагдлаа"
+    });
   };
 
   const updatePaymentStatus = async (paymentId: string, status: 'verified' | 'rejected', notes: string) => {
@@ -147,33 +210,99 @@ export const AdminPayments = () => {
     <div className="container mx-auto px-4 py-8">
       <div className="flex items-center justify-between mb-8">
         <h1 className="text-3xl font-bold">Төлбөрийн баталгаажуулалт</h1>
-        <Button onClick={fetchPayments} variant="outline">
-          Шинэчлэх
-        </Button>
+        <div className="flex gap-3">
+          <Button onClick={fetchPayments} variant="outline">
+            Шинэчлэх
+          </Button>
+        </div>
       </div>
 
+      {/* Search and Filter Controls */}
+      <Card className="mb-6">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Search className="w-5 h-5" />
+            Хайлт ба шүүлтүүр
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <Label htmlFor="search">Лавлах дугаар / Хэрэглэгчийн нэр / Утас</Label>
+              <Input
+                id="search"
+                placeholder="FL12345678ABCD эсвэл хэрэглэгчийн нэр..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="mt-1"
+              />
+            </div>
+            <div>
+              <Label htmlFor="status">Төлбөрийн төлөв</Label>
+              <select
+                id="status"
+                value={statusFilter}
+                onChange={(e) => setStatusFilter(e.target.value)}
+                className="w-full mt-1 px-3 py-2 border border-input bg-background rounded-md text-sm"
+              >
+                <option value="all">Бүгд</option>
+                <option value="pending">Хүлээгдэж байна</option>
+                <option value="verified">Баталгаажсан</option>
+                <option value="rejected">Татгалзсан</option>
+              </select>
+            </div>
+          </div>
+          
+          <div className="mt-4 flex items-center gap-4 text-sm text-muted-foreground">
+            <span>Нийт: {payments.length}</span>
+            <span>Шүүлтийн үр дүн: {filteredPayments.length}</span>
+            <span>Хүлээгдэж байна: {payments.filter(p => p.status === 'pending').length}</span>
+          </div>
+        </CardContent>
+      </Card>
+
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-        {payments.map((payment) => (
+        {filteredPayments.map((payment) => (
           <Card key={payment.id} className="hover:shadow-lg transition-shadow">
             <CardHeader className="pb-3">
               <div className="flex items-center justify-between">
-                <CardTitle className="text-lg">#{payment.reference_number}</CardTitle>
+                <div className="flex items-center gap-2">
+                  <CardTitle className="text-lg">#{payment.reference_number}</CardTitle>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => copyToClipboard(payment.reference_number)}
+                  >
+                    <Copy className="w-3 h-3" />
+                  </Button>
+                </div>
                 {getStatusBadge(payment.status)}
               </div>
-              <p className="text-sm text-muted-foreground">
-                {new Date(payment.created_at).toLocaleDateString('mn-MN')}
-              </p>
+              <div className="space-y-1">
+                <p className="text-sm font-medium text-foreground">
+                  {payment.profiles?.full_name || 'Тодорхойгүй хэрэглэгч'}
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  {new Date(payment.created_at).toLocaleDateString('mn-MN')} {new Date(payment.created_at).toLocaleTimeString('mn-MN', { hour: '2-digit', minute: '2-digit' })}
+                </p>
+              </div>
             </CardHeader>
             <CardContent className="space-y-3">
-              <div className="grid grid-cols-2 gap-4 text-sm">
-                <div>
-                  <p className="font-medium">Төлбөрийн арга:</p>
-                  <p className="text-muted-foreground">{payment.payment_method}</p>
+              <div className="grid grid-cols-1 gap-3 text-sm">
+                <div className="flex items-center justify-between">
+                  <span className="font-medium">Төлбөрийн арга:</span>
+                  <span className="text-muted-foreground">{payment.payment_method}</span>
                 </div>
-                <div>
-                  <p className="font-medium">Дүн:</p>
-                  <p className="text-muted-foreground">{payment.amount.toLocaleString()}₮</p>
+                <div className="flex items-center justify-between">
+                  <span className="font-medium">Дүн:</span>
+                  <span className="text-muted-foreground font-semibold">{payment.amount.toLocaleString()}₮</span>
                 </div>
+                {payment.profiles?.phone_number && (
+                  <div className="flex items-center justify-between">
+                    <span className="font-medium">Утас:</span>
+                    <span className="text-muted-foreground">+976 {payment.profiles.phone_number}</span>
+                  </div>
+                )}
               </div>
               
               {payment.admin_notes && (
@@ -204,23 +333,97 @@ export const AdminPayments = () => {
         ))}
       </div>
 
-      {payments.length === 0 && (
+      {filteredPayments.length === 0 && !loading && (
         <div className="text-center py-12">
-          <p className="text-muted-foreground">Төлбөрийн мэдээлэл олдсонгүй</p>
+          <p className="text-muted-foreground">
+            {searchQuery || statusFilter !== 'all' ? 'Хайлтын үр дүн олдсонгүй' : 'Төлбөрийн мэдээлэл олдсонгүй'}
+          </p>
         </div>
       )}
 
       {/* Payment Review Modal */}
       {selectedPayment && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
-          <Card className="w-full max-w-md">
+          <Card className="w-full max-w-2xl max-h-[90vh] overflow-y-auto">
             <CardHeader>
-              <CardTitle>Төлбөр шалгах</CardTitle>
-              <p className="text-sm text-muted-foreground">
-                #{selectedPayment.reference_number}
-              </p>
+              <CardTitle className="flex items-center gap-2">
+                <CreditCard className="w-5 h-5" />
+                Төлбөр шалгах - #{selectedPayment.reference_number}
+              </CardTitle>
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => copyToClipboard(selectedPayment.reference_number)}
+                >
+                  <Copy className="w-3 h-3 mr-1" />
+                  Лавлах дугаар хуулах
+                </Button>
+                {getStatusBadge(selectedPayment.status)}
+              </div>
             </CardHeader>
-            <CardContent className="space-y-4">
+            <CardContent className="space-y-6">
+              {/* User Information Section */}
+              <div className="p-4 bg-muted/50 rounded-lg">
+                <h4 className="font-medium mb-3 flex items-center gap-2">
+                  <User className="w-4 h-4" />
+                  Хэрэглэгчийн мэдээлэл
+                </h4>
+                <div className="grid grid-cols-2 gap-4 text-sm">
+                  <div>
+                    <p className="font-medium">Нэр:</p>
+                    <p>{selectedPayment.profiles?.full_name || 'Тодорхойгүй'}</p>
+                  </div>
+                  <div>
+                    <p className="font-medium">И-мэйл:</p>
+                    <p>{selectedPayment.profiles?.email || 'Байхгүй'}</p>
+                  </div>
+                  <div>
+                    <p className="font-medium">Утас:</p>
+                    <p>{selectedPayment.profiles?.phone_number ? `+976 ${selectedPayment.profiles.phone_number}` : 'Байхгүй'}</p>
+                  </div>
+                  <div>
+                    <p className="font-medium">Регистр:</p>
+                    <p>{selectedPayment.profiles?.register_number || 'Байхгүй'}</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Bank Account Information */}
+              <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                <h4 className="font-medium mb-3 flex items-center gap-2 text-blue-900">
+                  <Hash className="w-4 h-4" />
+                  Банкны данстай тулгах мэдээлэл
+                </h4>
+                <div className="space-y-2 text-sm">
+                  <div className="flex items-center justify-between">
+                    <span className="font-medium">IBAN дугаар:</span>
+                    <span className="font-mono bg-white px-2 py-1 rounded">MN24001500 2015180476</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="font-medium">Данс эзэмшигч:</span>
+                    <span>Byektas Syerikbyek</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="font-medium">Лавлах дугаар:</span>
+                    <div className="flex items-center gap-2">
+                      <span className="font-mono bg-white px-2 py-1 rounded">{selectedPayment.reference_number}</span>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => copyToClipboard(selectedPayment.reference_number)}
+                      >
+                        <Copy className="w-3 h-3" />
+                      </Button>
+                    </div>
+                  </div>
+                  <p className="text-xs text-blue-700 mt-2">
+                    💡 Банкны системд энэ лавлах дугаараар хайж, төлбөрийг баталгаажуулна уу
+                  </p>
+                </div>
+              </div>
+
+              {/* Payment Details */}
               <div className="grid grid-cols-2 gap-4 text-sm">
                 <div>
                   <p className="font-medium">Төлбөрийн арга:</p>
@@ -228,15 +431,15 @@ export const AdminPayments = () => {
                 </div>
                 <div>
                   <p className="font-medium">Дүн:</p>
-                  <p>{selectedPayment.amount.toLocaleString()}₮</p>
+                  <p className="font-semibold">{selectedPayment.amount.toLocaleString()}₮</p>
                 </div>
                 <div>
-                  <p className="font-medium">Огноо:</p>
+                  <p className="font-medium">Төлсөн огноо:</p>
                   <p>{new Date(selectedPayment.payment_date).toLocaleDateString('mn-MN')}</p>
                 </div>
                 <div>
-                  <p className="font-medium">Лавлах дугаар:</p>
-                  <p>{selectedPayment.reference_number}</p>
+                  <p className="font-medium">Хүсэлт гаргасан:</p>
+                  <p>{new Date(selectedPayment.created_at).toLocaleDateString('mn-MN')} {new Date(selectedPayment.created_at).toLocaleTimeString('mn-MN', { hour: '2-digit', minute: '2-digit' })}</p>
                 </div>
               </div>
 
