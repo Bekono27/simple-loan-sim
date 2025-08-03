@@ -232,8 +232,11 @@ export const AdminDashboard = () => {
                   </Badge>
                 )}
               </Button>
-              <Button onClick={() => navigate("/admin-loan-review")} variant="outline" className="w-full">
+              <Button onClick={() => navigate("/admin-loan-review")} variant="outline" className="w-full mb-2">
                 Факт зээлийн хүсэлт шалгах
+              </Button>
+              <Button onClick={() => navigate("/admin-users")} variant="outline" className="w-full">
+                Хэрэглэгчийн удирдлага
               </Button>
             </CardContent>
           </Card>

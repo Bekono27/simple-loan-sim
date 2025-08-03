@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/components/AuthProvider";
@@ -25,6 +26,7 @@ import {
 
 export const Profile = () => {
   const [isEditing, setIsEditing] = useState(false);
+  const [showTerms, setShowTerms] = useState(false);
   const [profile, setProfile] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
@@ -208,11 +210,11 @@ export const Profile = () => {
         <div className="grid grid-cols-2 gap-4">
           <Card className="p-4 text-center">
             <div className="text-2xl font-bold text-primary">0</div>
-            <div className="text-sm text-muted-foreground">Зээлийн үнэлгээ</div>
+            <div className="text-sm text-muted-foreground">Факт зээлийн үнэлгээ</div>
           </Card>
           <Card className="p-4 text-center">
             <div className="text-2xl font-bold text-success">1</div>
-            <div className="text-sm text-muted-foreground">Идэвхтэй зээл</div>
+            <div className="text-sm text-muted-foreground">Идэвхтэй факт зээл</div>
           </Card>
         </div>
 
@@ -225,8 +227,8 @@ export const Profile = () => {
                   <CreditCard className="w-5 h-5 text-primary" />
                 </div>
                 <div>
-                  <div className="font-medium">Миний зээлүүд</div>
-                  <div className="text-sm text-muted-foreground">Зээлийн түүх харах</div>
+                  <div className="font-medium">Миний факт зээлүүд</div>
+                  <div className="text-sm text-muted-foreground">Факт зээлийн түүх харах</div>
                 </div>
               </div>
               <Button variant="ghost" size="sm" onClick={() => navigate("/dashboard")}>
@@ -285,6 +287,24 @@ export const Profile = () => {
               </Button>
             </div>
           </Card>
+
+          {/* Terms and Conditions */}
+          <Card className="p-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center">
+                  <FileText className="w-5 h-5 text-primary" />
+                </div>
+                <div>
+                  <div className="font-medium">Үйлчилгээний нөхцөл</div>
+                  <div className="text-sm text-muted-foreground">Гэрээ болон нууцлалын бодлого</div>
+                </div>
+              </div>
+              <Button variant="ghost" size="sm" onClick={() => setShowTerms(true)}>
+                Унших
+              </Button>
+            </div>
+          </Card>
         </div>
 
         {/* Logout Button */}
@@ -304,6 +324,81 @@ export const Profile = () => {
           <p>FACT LLC - FACT Loan v1.0</p>
           <p>© 2025 Бүх эрх хуулиар хамгаалагдсан</p>
         </div>
+
+        {/* Terms and Conditions Dialog */}
+        <Dialog open={showTerms} onOpenChange={setShowTerms}>
+          <DialogContent className="max-w-md max-h-[80vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle>Үйлчилгээний нөхцөл болон Нууцлалын бодлого</DialogTitle>
+              <DialogDescription>
+                Сүүлд шинэчлэгдсэн: 2025 оны 8 сар
+              </DialogDescription>
+            </DialogHeader>
+            <div className="space-y-4 text-sm">
+              <div>
+                <h4 className="font-semibold">1. Бидний цуглуулах мэдээлэл</h4>
+                <p>• Нэр, и-мэйл, холбоо барих мэдээлэл</p>
+                <p>• Банкны хуулга (факт зээлийн боломж тооцоолоход)</p>
+                <p>• Төхөөрөмжийн мэдээлэл аюулгүй байдалд</p>
+              </div>
+              
+              <div>
+                <h4 className="font-semibold">2. Мэдээлэл ашиглалт</h4>
+                <p>• Факт зээлийн боломжийн тооцоолол (зөвхөн мэдээлэл зорилгоор)</p>
+                <p>• Гуравдагч талд зөвшөөрөлгүйгээр өгөхгүй</p>
+                <p>• Таны мэдээллийг зарахгүй эсвэл буруу ашиглахгүй</p>
+              </div>
+
+              <div>
+                <h4 className="font-semibold">3. Факт зээлийн үйлчилгээний талаар</h4>
+                <p>• Энэ нь зөвхөн мэдээллийн үйлчилгээ</p>
+                <p>• Бид бодит зээл олгодоггүй</p>
+                <p>• Үр дүн нь зөвхөн танин мэдэхүйн зорилготой</p>
+                <p>• Төлбөр нь шинжилгээний зардал болон системийн хөгжүүлэлтэд зарцуулагдана</p>
+              </div>
+
+              <div>
+                <h4 className="font-semibold">4. Мэдээлэл хадгалалт</h4>
+                <p>• Таны мэдээллийг аюулгүй шифрлэлттэйгээр хадгална</p>
+                <p>• Зөвхөн эрх бүхий хүмүүст хандах эрх</p>
+                <p>• Мэдээлэл задруулах, алдагдахаас хамгаална</p>
+              </div>
+
+              <div>
+                <h4 className="font-semibold">5. Таны эрх</h4>
+                <p>• Хүссэн үедээ мэдээллээ устгуулах эрхтэй</p>
+                <p>• Мэдээллээ засварлах, шинэчлэх эрхтэй</p>
+                <p>• Асуудал гарвал support@factloan.mn хандана уу</p>
+              </div>
+
+              <div>
+                <h4 className="font-semibold">6. Төлбөрийн нөхцөл</h4>
+                <p>• Факт зээлийн тооцоололын төлбөр: 3,000₮</p>
+                <p>• Энэ төлбөр нь зөвхөн системийн шинжилгээнд ашиглагдана</p>
+                <p>• Төлбөр нь буцаагдахгүй</p>
+                <p>• Шинжилгээ эхлэсний дараа бүх төлбөр буцаагдахгүй</p>
+              </div>
+
+              <div>
+                <h4 className="font-semibold">7. Аюулгүй байдал</h4>
+                <p>• Нууц үг нь хүчтэй байх ёстой (8+ тэмдэгт, том/жижиг үсэг, тоо, тусгай тэмдэгт)</p>
+                <p>• Нэвтрэх мэдээллээ хэзээ ч хуваалцахгүй</p>
+                <p>• Хуурамч вэбсайтаас болгоомжилж байна уу</p>
+                <p>• Албан ёсны домэйн: factloan.mn</p>
+              </div>
+
+              <div>
+                <h4 className="font-semibold">8. Хариуцлагын хязгаарлалт</h4>
+                <p>• FACT LLC нь зөвхөн мэдээллийн үйлчилгээ үзүүлдэг</p>
+                <p>• Бодит зээлийн асуудлаар хариуцлага хүлээхгүй</p>
+                <p>• Тооцоололын үр дүн нь зөвхөн лавлах мэдээлэл</p>
+              </div>
+            </div>
+            <Button onClick={() => setShowTerms(false)} className="w-full">
+              Ойлголоо
+            </Button>
+          </DialogContent>
+        </Dialog>
       </div>
     </Layout>
   );

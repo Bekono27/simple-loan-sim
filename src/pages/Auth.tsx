@@ -8,9 +8,10 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { User, Mail, Lock, Phone, Calendar, IdCard, Loader2 } from "lucide-react";
+import { User, Mail, Lock, Phone, Calendar, IdCard, Loader2, Eye, EyeOff } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { validatePassword, checkCommonPasswords, cleanupAuthState } from "@/lib/security";
 
 export const Auth = () => {
   const navigate = useNavigate();
@@ -18,6 +19,8 @@ export const Auth = () => {
   const [loading, setLoading] = useState(false);
   const [showTerms, setShowTerms] = useState(false);
   const [agreedToTerms, setAgreedToTerms] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [passwordStrength, setPasswordStrength] = useState<string>("");
   const [authMethod, setAuthMethod] = useState<"email" | "phone" | "username">("email");
 
   const [loginData, setLoginData] = useState({
@@ -58,6 +61,9 @@ export const Auth = () => {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+
+    // Clean up existing auth state
+    cleanupAuthState();
 
     try {
       let authData;
@@ -145,6 +151,30 @@ export const Auth = () => {
       });
       return;
     }
+
+    // Validate password strength
+    const passwordValidation = validatePassword(signupData.password);
+    if (!passwordValidation.isValid) {
+      toast({
+        title: "Нууц үгийн алдаа",
+        description: passwordValidation.message,
+        variant: "destructive"
+      });
+      return;
+    }
+
+    // Check for common passwords
+    if (checkCommonPasswords(signupData.password)) {
+      toast({
+        title: "Сул нууц үг",
+        description: "Энэ нууц үг хэтэрхий энгийн байна. Илүү хүчтэй нууц үг ашиглана уу.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    // Clean up existing auth state
+    cleanupAuthState();
 
     // Validate phone number if using phone auth
     if (authMethod === "phone" && !/^\d{8}$/.test(signupData.phoneNumber)) {
@@ -427,14 +457,32 @@ export const Auth = () => {
                       <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                       <Input
                         id="signup-password"
-                        type="password"
+                        type={showPassword ? "text" : "password"}
                         placeholder="••••••••"
-                        className="pl-10"
+                        className="pl-10 pr-10"
                         value={signupData.password}
-                        onChange={(e) => setSignupData(prev => ({ ...prev, password: e.target.value }))}
+                        onChange={(e) => {
+                          setSignupData(prev => ({ ...prev, password: e.target.value }));
+                          const validation = validatePassword(e.target.value);
+                          setPasswordStrength(validation.isValid ? "Хүчтэй" : validation.message);
+                        }}
                         required
                       />
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        className="absolute right-2 top-1/2 -translate-y-1/2 h-6 w-6 p-0"
+                        onClick={() => setShowPassword(!showPassword)}
+                      >
+                        {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                      </Button>
                     </div>
+                    {passwordStrength && (
+                      <p className={`text-xs ${passwordStrength === "Хүчтэй" ? "text-green-600" : "text-red-600"}`}>
+                        {passwordStrength}
+                      </p>
+                    )}
                   </div>
 
                   <div className="grid grid-cols-2 gap-4">

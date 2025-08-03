@@ -12,10 +12,10 @@ export const Landing = () => {
         {/* Logo and Header */}
         <div className="text-center mb-12">
           <div className="w-20 h-20 bg-primary rounded-2xl flex items-center justify-center mx-auto mb-4">
-            <span className="text-2xl font-bold text-primary-foreground">SL</span>
+            <span className="text-2xl font-bold text-primary-foreground">FL</span>
           </div>
-          <h1 className="text-3xl font-bold text-foreground mb-2">Простой Зээл</h1>
-          <p className="text-lg text-muted-foreground">Зээлийн боломжийг шалгах платформ</p>
+          <h1 className="text-3xl font-bold text-foreground mb-2">Факт Зээл</h1>
+          <p className="text-lg text-muted-foreground">Факт зээлийн боломжийг шалгах платформ</p>
         </div>
 
         {/* Features */}
@@ -27,7 +27,7 @@ export const Landing = () => {
               </div>
               <div>
                 <h3 className="font-medium">Хурдан шалгалт</h3>
-                <p className="text-sm text-muted-foreground">Зээлийн боломжийг хурдан мэдээрэй</p>
+                <p className="text-sm text-muted-foreground">Факт зээлийн боломжийг хурдан мэдээрэй</p>
               </div>
             </div>
           </Card>
@@ -38,8 +38,8 @@ export const Landing = () => {
                 <Clock className="w-5 h-5 text-primary" />
               </div>
               <div>
-                <h3 className="font-medium">P2P зээл</h3>
-                <p className="text-sm text-muted-foreground">Хүмүүсийн хооронд зээл</p>
+                <h3 className="font-medium">P2P факт зээл</h3>
+                <p className="text-sm text-muted-foreground">Хүмүүсийн хооронд факт зээл</p>
               </div>
             </div>
           </Card>
