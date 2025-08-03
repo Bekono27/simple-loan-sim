@@ -14,6 +14,36 @@ export type Database = {
   }
   public: {
     Tables: {
+      admin_audit_log: {
+        Row: {
+          action: string
+          admin_user_id: string
+          created_at: string | null
+          details: Json | null
+          id: string
+          target_id: string | null
+          target_table: string | null
+        }
+        Insert: {
+          action: string
+          admin_user_id: string
+          created_at?: string | null
+          details?: Json | null
+          id?: string
+          target_id?: string | null
+          target_table?: string | null
+        }
+        Update: {
+          action?: string
+          admin_user_id?: string
+          created_at?: string | null
+          details?: Json | null
+          id?: string
+          target_id?: string | null
+          target_table?: string | null
+        }
+        Relationships: []
+      }
       loan_applications: {
         Row: {
           amount: number
@@ -163,6 +193,7 @@ export type Database = {
           id: string
           phone_number: string | null
           register_number: string | null
+          role: Database["public"]["Enums"]["app_role"]
           updated_at: string
           user_id: string
           username: string
@@ -175,6 +206,7 @@ export type Database = {
           id?: string
           phone_number?: string | null
           register_number?: string | null
+          role?: Database["public"]["Enums"]["app_role"]
           updated_at?: string
           user_id: string
           username: string
@@ -187,6 +219,7 @@ export type Database = {
           id?: string
           phone_number?: string | null
           register_number?: string | null
+          role?: Database["public"]["Enums"]["app_role"]
           updated_at?: string
           user_id?: string
           username?: string
@@ -198,10 +231,26 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      get_current_user_role: {
+        Args: Record<PropertyKey, never>
+        Returns: Database["public"]["Enums"]["app_role"]
+      }
+      is_admin: {
+        Args: { user_id?: string }
+        Returns: boolean
+      }
+      log_admin_action: {
+        Args: {
+          action_type: string
+          table_name?: string
+          record_id?: string
+          action_details?: Json
+        }
+        Returns: undefined
+      }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "user" | "admin"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -328,6 +377,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["user", "admin"],
+    },
   },
 } as const
