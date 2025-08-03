@@ -233,28 +233,11 @@ export const LoanPayment = () => {
               </div>
             </div>
 
-            {/* Visa Card Option */}
-            <div 
-              onClick={() => setPaymentMethod("visa")}
-              className={`p-4 border rounded-lg cursor-pointer transition-colors ${
-                paymentMethod === "visa" 
-                  ? "border-primary bg-primary/5" 
-                  : "border-border hover:border-primary/50"
-              }`}
-            >
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center">
-                  <CreditCard className="w-5 h-5 text-primary" />
-                </div>
-                <div className="flex-1">
-                  <h3 className="font-medium">Visa карт</h3>
-                  <p className="text-sm text-muted-foreground">Кредит карт</p>
-                </div>
-                <div className="text-xs bg-muted px-2 py-1 rounded">Удахгүй</div>
-                {paymentMethod === "visa" && (
-                  <CheckCircle className="w-5 h-5 text-primary" />
-                )}
-              </div>
+            {/* Other Methods Coming Soon */}
+            <div className="p-4 border border-dashed border-muted-foreground/30 rounded-lg text-center">
+              <p className="text-sm text-muted-foreground">
+                Бусад төлбөрийн аргууд тун удахгүй нэмэгдэнэ
+              </p>
             </div>
           </CardContent>
         </Card>
@@ -340,8 +323,6 @@ export const LoanPayment = () => {
           </Card>
         )}
 
-        {/* Payment Methods Recommendation */}
-        <PaymentMethods />
 
         {/* Agreement and Proceed */}
         <Card className="neu-card">
