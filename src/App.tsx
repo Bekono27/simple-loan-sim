@@ -16,6 +16,10 @@ import { SimpleBuy } from "./pages/SimpleBuy";
 import { FAQ } from "./pages/FAQ";
 import { Support } from "./pages/Support";
 import { Profile } from "./pages/Profile";
+import { Documents } from "./pages/Documents";
+import { Security } from "./pages/Security";
+import { Settings } from "./pages/Settings";
+import { P2PLoan } from "./pages/P2PLoan";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -42,6 +46,10 @@ const App = () => (
             <Route path="/faq" element={<FAQ />} />
             <Route path="/support" element={<Support />} />
             <Route path="/profile" element={<Profile />} />
+            <Route path="/documents" element={<Documents />} />
+            <Route path="/security" element={<Security />} />
+            <Route path="/settings" element={<Settings />} />
+            <Route path="/p2p" element={<P2PLoan />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>

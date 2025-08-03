@@ -135,6 +135,7 @@ export const Dashboard = () => {
               </Button>
               <Button 
                 variant="outline"
+                onClick={() => navigate("/p2p")}
                 className="h-16 flex flex-col gap-1"
               >
                 <Users className="w-5 h-5" />

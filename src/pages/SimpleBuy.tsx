@@ -193,7 +193,7 @@ export const SimpleBuy = () => {
 
         {/* Featured Merchants */}
         <div>
-          <h3 className="font-semibold mb-4">Featured Partners</h3>
+          <h3 className="font-semibold mb-4">Хамтрагч худалдагчид</h3>
           <div className="space-y-3">
             {mockMerchants.map((merchant) => (
               <Card key={merchant.id} className="p-4">
@@ -219,7 +219,7 @@ export const SimpleBuy = () => {
                     size="sm"
                     className="bg-warning hover:bg-warning/90 text-warning-foreground"
                   >
-                    Buy Now
+                    Одоо авах
                   </Button>
                 </div>
               </Card>
@@ -230,11 +230,11 @@ export const SimpleBuy = () => {
         {/* Find More Merchants */}
         <Card className="p-4 text-center">
           <Store className="w-8 h-8 text-muted-foreground mx-auto mb-2" />
-          <h3 className="font-medium mb-2">Looking for something else?</h3>
+          <h3 className="font-medium mb-2">Өөр зүйл хайж байна уу?</h3>
           <p className="text-sm text-muted-foreground mb-3">
-            Visit any of our partner stores and look for the Simple Buy logo
+            Манай хамтрагч дэлгүүрүүдээс Simple Buy тэмдэгийг хайгаарай
           </p>
-          <Badge variant="outline">1,000+ Partner Merchants</Badge>
+          <Badge variant="outline">1,000+ Хамтрагч худалдагч</Badge>
         </Card>
       </div>
     </Layout>

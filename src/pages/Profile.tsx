@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Layout } from "@/components/Layout";
 import { Button } from "@/components/ui/button";
@@ -6,6 +6,8 @@ import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/components/AuthProvider";
 import { 
   User, 
   Phone, 
@@ -16,44 +18,102 @@ import {
   Edit3,
   Settings,
   CreditCard,
-  FileText
+  FileText,
+  Upload,
+  Download
 } from "lucide-react";
 
 export const Profile = () => {
   const [isEditing, setIsEditing] = useState(false);
-  const [userData, setUserData] = useState(() => {
-    const stored = localStorage.getItem("simple_loan_user");
-    return stored ? JSON.parse(stored) : {
-      id: "1",
-      name: "Болдбаатар",
-      phone: "88001234",
-      email: "bold@email.mn",
-      joinedDate: new Date().toISOString(),
-      creditScore: 750,
-      totalLoans: 2,
-      activeLoans: 1
-    };
-  });
+  const [profile, setProfile] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { user, signOut } = useAuth();
 
-  const handleSave = () => {
-    localStorage.setItem("simple_loan_user", JSON.stringify(userData));
-    setIsEditing(false);
-    toast({
-      title: "Амжилттай хадгалагдлаа",
-      description: "Таны мэдээлэл шинэчлэгдлээ",
-    });
+  useEffect(() => {
+    if (!user) {
+      navigate("/auth");
+      return;
+    }
+    loadProfile();
+  }, [user, navigate]);
+
+  const loadProfile = async () => {
+    if (!user) return;
+    
+    try {
+      const { data: profileData } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('user_id', user.id)
+        .maybeSingle();
+
+      if (profileData) {
+        setProfile(profileData);
+      }
+    } catch (error) {
+      toast({
+        title: "Алдаа гарлаа",
+        description: "Профайл мэдээлэл ачаалахад алдаа гарлаа",
+        variant: "destructive"
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const handleLogout = () => {
-    localStorage.removeItem("simple_loan_user");
-    toast({
-      title: "Амжилттай гарлаа",
-      description: "Дахин уулзах хүртэл",
-    });
-    navigate("/");
+  const handleSave = async () => {
+    if (!user || !profile) return;
+
+    try {
+      const { error } = await supabase
+        .from('profiles')
+        .update(profile)
+        .eq('user_id', user.id);
+
+      if (error) throw error;
+
+      setIsEditing(false);
+      toast({
+        title: "Амжилттай хадгалагдлаа",
+        description: "Таны мэдээлэл шинэчлэгдлээ",
+      });
+    } catch (error) {
+      toast({
+        title: "Алдаа гарлаа",
+        description: "Мэдээлэл хадгалахад алдаа гарлаа",
+        variant: "destructive"
+      });
+    }
   };
+
+  const handleLogout = async () => {
+    try {
+      await signOut();
+      toast({
+        title: "Амжилттай гарлаа",
+        description: "Дахин уулзах хүртэл",
+      });
+      navigate("/");
+    } catch (error) {
+      toast({
+        title: "Алдаа гарлаа",
+        description: "Гарахад алдаа гарлаа",
+        variant: "destructive"
+      });
+    }
+  };
+
+  if (loading) {
+    return (
+      <Layout title="Профайл">
+        <div className="flex items-center justify-center h-64">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+        </div>
+      </Layout>
+    );
+  }
 
   return (
     <Layout title="Профайл">
@@ -66,8 +126,8 @@ export const Profile = () => {
                 <User className="w-8 h-8 text-primary-foreground" />
               </div>
               <div>
-                <h2 className="text-xl font-bold">{userData.name}</h2>
-                <p className="text-muted-foreground">+976 {userData.phone}</p>
+                <h2 className="text-xl font-bold">{profile?.full_name || profile?.username || 'Хэрэглэгч'}</h2>
+                <p className="text-muted-foreground">{profile?.phone_number && `+976 ${profile.phone_number}`}</p>
               </div>
             </div>
             <Button
@@ -83,20 +143,35 @@ export const Profile = () => {
           {isEditing ? (
             <div className="space-y-4">
               <div>
-                <Label htmlFor="name">Нэр</Label>
+                <Label htmlFor="name">Овог нэр</Label>
                 <Input
                   id="name"
-                  value={userData.name}
-                  onChange={(e) => setUserData(prev => ({ ...prev, name: e.target.value }))}
+                  value={profile?.full_name || ''}
+                  onChange={(e) => setProfile((prev: any) => ({ ...prev, full_name: e.target.value }))}
                 />
               </div>
               <div>
-                <Label htmlFor="email">И-мэйл</Label>
+                <Label htmlFor="username">Хэрэглэгчийн нэр</Label>
                 <Input
-                  id="email"
-                  type="email"
-                  value={userData.email}
-                  onChange={(e) => setUserData(prev => ({ ...prev, email: e.target.value }))}
+                  id="username"
+                  value={profile?.username || ''}
+                  onChange={(e) => setProfile((prev: any) => ({ ...prev, username: e.target.value }))}
+                />
+              </div>
+              <div>
+                <Label htmlFor="phone">Утасны дугаар</Label>
+                <Input
+                  id="phone"
+                  value={profile?.phone_number || ''}
+                  onChange={(e) => setProfile((prev: any) => ({ ...prev, phone_number: e.target.value }))}
+                />
+              </div>
+              <div>
+                <Label htmlFor="register">Регистрийн дугаар</Label>
+                <Input
+                  id="register"
+                  value={profile?.register_number || ''}
+                  onChange={(e) => setProfile((prev: any) => ({ ...prev, register_number: e.target.value }))}
                 />
               </div>
               <Button onClick={handleSave} className="w-full">
@@ -106,15 +181,25 @@ export const Profile = () => {
           ) : (
             <div className="space-y-3">
               <div className="flex items-center gap-3">
-                <Mail className="w-4 h-4 text-muted-foreground" />
-                <span className="text-sm">{userData.email}</span>
+                <User className="w-4 h-4 text-muted-foreground" />
+                <span className="text-sm">{profile?.username || 'Тодорхойгүй'}</span>
+              </div>
+              <div className="flex items-center gap-3">
+                <Phone className="w-4 h-4 text-muted-foreground" />
+                <span className="text-sm">{profile?.phone_number || 'Утас нэмэгдээгүй'}</span>
               </div>
               <div className="flex items-center gap-3">
                 <Calendar className="w-4 h-4 text-muted-foreground" />
                 <span className="text-sm">
-                  Элссэн: {new Date(userData.joinedDate).toLocaleDateString('mn-MN')}
+                  Элссэн: {profile?.created_at ? new Date(profile.created_at).toLocaleDateString('mn-MN') : 'Тодорхойгүй'}
                 </span>
               </div>
+              {profile?.register_number && (
+                <div className="flex items-center gap-3">
+                  <FileText className="w-4 h-4 text-muted-foreground" />
+                  <span className="text-sm">РД: {profile.register_number}</span>
+                </div>
+              )}
             </div>
           )}
         </Card>
@@ -122,11 +207,11 @@ export const Profile = () => {
         {/* Stats Cards */}
         <div className="grid grid-cols-2 gap-4">
           <Card className="p-4 text-center">
-            <div className="text-2xl font-bold text-primary">{userData.creditScore}</div>
+            <div className="text-2xl font-bold text-primary">750</div>
             <div className="text-sm text-muted-foreground">Зээлийн үнэлгээ</div>
           </Card>
           <Card className="p-4 text-center">
-            <div className="text-2xl font-bold text-success">{userData.activeLoans}</div>
+            <div className="text-2xl font-bold text-success">1</div>
             <div className="text-sm text-muted-foreground">Идэвхтэй зээл</div>
           </Card>
         </div>
@@ -161,7 +246,7 @@ export const Profile = () => {
                   <div className="text-sm text-muted-foreground">Гэрээ болон баримтууд</div>
                 </div>
               </div>
-              <Button variant="ghost" size="sm">
+              <Button variant="ghost" size="sm" onClick={() => navigate("/documents")}>
                 Харах
               </Button>
             </div>
@@ -178,7 +263,7 @@ export const Profile = () => {
                   <div className="text-sm text-muted-foreground">Нууц үг, хуруугийн хээ</div>
                 </div>
               </div>
-              <Button variant="ghost" size="sm">
+              <Button variant="ghost" size="sm" onClick={() => navigate("/security")}>
                 Тохируулах
               </Button>
             </div>
@@ -195,7 +280,7 @@ export const Profile = () => {
                   <div className="text-sm text-muted-foreground">Мэдэгдэл, хэл сонголт</div>
                 </div>
               </div>
-              <Button variant="ghost" size="sm">
+              <Button variant="ghost" size="sm" onClick={() => navigate("/settings")}>
                 Тохируулах
               </Button>
             </div>
