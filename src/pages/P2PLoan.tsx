@@ -20,7 +20,8 @@ import {
   DollarSign, 
   User,
   CheckCircle,
-  AlertCircle
+  AlertCircle,
+  Heart
 } from "lucide-react";
 
 export const P2PLoan = () => {
@@ -33,6 +34,7 @@ export const P2PLoan = () => {
   const [duration, setDuration] = useState("");
   const [description, setDescription] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const [wishlist, setWishlist] = useState<Set<string>>(new Set());
   const navigate = useNavigate();
   const { toast } = useToast();
   const { user } = useAuth();
@@ -131,6 +133,26 @@ export const P2PLoan = () => {
     } finally {
       setSubmitting(false);
     }
+  };
+
+  const toggleWishlist = (loanId: string) => {
+    setWishlist(prev => {
+      const newWishlist = new Set(prev);
+      if (newWishlist.has(loanId)) {
+        newWishlist.delete(loanId);
+        toast({
+          title: "Хүсэлт жагсаалтаас хасагдлаа",
+          description: "Зээлийг хүсэлт жагсаалтаас хаслаа",
+        });
+      } else {
+        newWishlist.add(loanId);
+        toast({
+          title: "Хүсэлт жагсаалтанд нэмэгдлээ",
+          description: "Зээлийг хүсэлт жагсаалтанд нэмлээ",
+        });
+      }
+      return newWishlist;
+    });
   };
 
   const handleApplyForLoan = async (loanId: string) => {
@@ -244,13 +266,23 @@ export const P2PLoan = () => {
                           {new Date(loan.created_at).toLocaleDateString('mn-MN')}
                         </p>
                       </div>
-                      <div className="ml-4">
+                      <div className="ml-4 space-y-2">
                         <Button 
                           onClick={() => handleApplyForLoan(loan.id)}
                           size="sm"
                           disabled={loan.status !== 'available'}
+                          className="w-full"
                         >
                           Хүсэлт гаргах
+                        </Button>
+                        <Button
+                          onClick={() => toggleWishlist(loan.id)}
+                          variant={wishlist.has(loan.id) ? "default" : "outline"}
+                          size="sm"
+                          className="w-full"
+                        >
+                          <Heart className={`w-4 h-4 mr-2 ${wishlist.has(loan.id) ? 'fill-current' : ''}`} />
+                          {wishlist.has(loan.id) ? 'Хүсэлтэнд байна' : 'Хүсэлтэнд нэмэх'}
                         </Button>
                       </div>
                     </div>

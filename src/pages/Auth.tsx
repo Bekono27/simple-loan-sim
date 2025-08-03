@@ -7,6 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { User, Mail, Lock, Phone, Calendar, IdCard, Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -17,9 +18,11 @@ export const Auth = () => {
   const [loading, setLoading] = useState(false);
   const [showTerms, setShowTerms] = useState(false);
   const [agreedToTerms, setAgreedToTerms] = useState(false);
+  const [authMethod, setAuthMethod] = useState<"email" | "phone">("email");
 
   const [loginData, setLoginData] = useState({
     email: "",
+    phone: "",
     password: ""
   });
 
@@ -56,16 +59,36 @@ export const Auth = () => {
     setLoading(true);
 
     try {
-      const { error } = await supabase.auth.signInWithPassword({
-        email: loginData.email,
-        password: loginData.password,
-      });
+      let authData;
+      if (authMethod === "phone") {
+        // Validate Mongolian phone number (8 digits)
+        if (!/^\d{8}$/.test(loginData.phone)) {
+          toast({
+            title: "Алдаа гарлаа",
+            description: "Утасны дугаар 8 оронтой байх ёстой",
+            variant: "destructive"
+          });
+          setLoading(false);
+          return;
+        }
+        authData = {
+          phone: `+976${loginData.phone}`,
+          password: loginData.password,
+        };
+      } else {
+        authData = {
+          email: loginData.email,
+          password: loginData.password,
+        };
+      }
+
+      const { error } = await supabase.auth.signInWithPassword(authData);
 
       if (error) {
         toast({
           title: "Алдаа гарлаа",
           description: error.message === "Invalid login credentials" 
-            ? "И-мэйл эсвэл нууц үг буруу байна"
+            ? authMethod === "phone" ? "Утас эсвэл нууц үг буруу байна" : "И-мэйл эсвэл нууц үг буруу байна"
             : "Нэвтрэхэд алдаа гарлаа",
           variant: "destructive"
         });
@@ -98,37 +121,74 @@ export const Auth = () => {
       return;
     }
 
+    // Validate phone number if using phone auth
+    if (authMethod === "phone" && !/^\d{8}$/.test(signupData.phoneNumber)) {
+      toast({
+        title: "Алдаа гарлаа",
+        description: "Утасны дугаар 8 оронтой байх ёстой",
+        variant: "destructive"
+      });
+      return;
+    }
+
     setLoading(true);
 
     try {
-      const { error } = await supabase.auth.signUp({
-        email: signupData.email,
-        password: signupData.password,
-        options: {
-          emailRedirectTo: `${window.location.origin}/dashboard`,
-          data: {
-            username: signupData.username,
-            full_name: signupData.fullName,
-            birth_date: signupData.birthDate,
-            register_number: signupData.registerNumber,
-            phone_number: signupData.phoneNumber,
+      let authData;
+      if (authMethod === "phone") {
+        authData = {
+          phone: `+976${signupData.phoneNumber}`,
+          password: signupData.password,
+          options: {
+            data: {
+              username: signupData.username,
+              full_name: signupData.fullName,
+              birth_date: signupData.birthDate,
+              register_number: signupData.registerNumber,
+              phone_number: signupData.phoneNumber,
+            }
           }
-        }
-      });
+        };
+      } else {
+        authData = {
+          email: signupData.email,
+          password: signupData.password,
+          options: {
+            emailRedirectTo: `${window.location.origin}/dashboard`,
+            data: {
+              username: signupData.username,
+              full_name: signupData.fullName,
+              birth_date: signupData.birthDate,
+              register_number: signupData.registerNumber,
+              phone_number: signupData.phoneNumber,
+            }
+          }
+        };
+      }
+
+      const { error } = await supabase.auth.signUp(authData);
 
       if (error) {
         toast({
           title: "Алдаа гарлаа",
           description: error.message === "User already registered" 
-            ? "Энэ и-мэйл хаягаар аль хэдийн бүртгүүлсэн байна"
+            ? authMethod === "phone" ? "Энэ утасны дугаараар аль хэдийн бүртгүүлсэн байна" : "Энэ и-мэйл хаягаар аль хэдийн бүртгүүлсэн байна"
             : "Бүртгэлд алдаа гарлаа",
           variant: "destructive"
         });
       } else {
-        toast({
-          title: "Амжилттай бүртгэгдлээ",
-          description: "И-мэйл хаягаа шалгаад баталгаажуулна уу"
-        });
+        if (authMethod === "phone") {
+          toast({
+            title: "Амжилттай бүртгэгдлээ",
+            description: "Зээлийн тооцоолол хийхээс өмнө баталгаажуулна уу"
+          });
+          navigate("/loan-eligibility");
+        } else {
+          toast({
+            title: "Амжилттай бүртгэгдлээ",
+            description: "И-мэйл хаягаа шалгаад баталгаажуулна уу"
+          });
+        }
       }
     } catch (error) {
       toast({
@@ -145,7 +205,7 @@ export const Auth = () => {
     <div className="min-h-screen bg-gradient-to-br from-primary/10 to-secondary/10 flex items-center justify-center p-4">
       <div className="w-full max-w-md space-y-6">
         <div className="text-center">
-          <h1 className="text-3xl font-bold text-primary">Простой Зээл</h1>
+          <h1 className="text-3xl font-bold text-primary">FACT Loan</h1>
           <p className="text-muted-foreground mt-2">Таны зээлийн платформд тавтай морилно уу</p>
         </div>
 
@@ -165,21 +225,57 @@ export const Auth = () => {
               </CardHeader>
               <CardContent>
                 <form onSubmit={handleLogin} className="space-y-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="email">И-мэйл хаяг</Label>
-                    <div className="relative">
-                      <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                      <Input
-                        id="email"
-                        type="email"
-                        placeholder="your@email.com"
-                        className="pl-10"
-                        value={loginData.email}
-                        onChange={(e) => setLoginData(prev => ({ ...prev, email: e.target.value }))}
-                        required
-                      />
-                    </div>
+                  <div className="space-y-3">
+                    <Label>Нэвтрэх арга</Label>
+                    <RadioGroup value={authMethod} onValueChange={(value: "email" | "phone") => setAuthMethod(value)}>
+                      <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="email" id="email-method" />
+                        <Label htmlFor="email-method">И-мэйл хаяг</Label>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="phone" id="phone-method" />
+                        <Label htmlFor="phone-method">Утасны дугаар (8 орон, Монгол)</Label>
+                      </div>
+                    </RadioGroup>
                   </div>
+
+                  {authMethod === "email" ? (
+                    <div className="space-y-2">
+                      <Label htmlFor="email">И-мэйл хаяг</Label>
+                      <div className="relative">
+                        <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                        <Input
+                          id="email"
+                          type="email"
+                          placeholder="your@email.com"
+                          className="pl-10"
+                          value={loginData.email}
+                          onChange={(e) => setLoginData(prev => ({ ...prev, email: e.target.value }))}
+                          required={authMethod === "email"}
+                        />
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="space-y-2">
+                      <Label htmlFor="phone">Утасны дугаар</Label>
+                      <div className="relative">
+                        <Phone className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                        <div className="flex">
+                          <span className="bg-muted px-3 py-2 border border-r-0 rounded-l-md text-muted-foreground">+976</span>
+                          <Input
+                            id="phone"
+                            type="tel"
+                            placeholder="12345678"
+                            className="rounded-l-none"
+                            maxLength={8}
+                            value={loginData.phone}
+                            onChange={(e) => setLoginData(prev => ({ ...prev, phone: e.target.value.replace(/\D/g, '') }))}
+                            required={authMethod === "phone"}
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  )}
 
                   <div className="space-y-2">
                     <Label htmlFor="password">Нууц үг</Label>
@@ -216,6 +312,20 @@ export const Auth = () => {
               </CardHeader>
               <CardContent>
                 <form onSubmit={handleSignup} className="space-y-4">
+                  <div className="space-y-3">
+                    <Label>Бүртгүүлэх арга</Label>
+                    <RadioGroup value={authMethod} onValueChange={(value: "email" | "phone") => setAuthMethod(value)}>
+                      <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="email" id="signup-email-method" />
+                        <Label htmlFor="signup-email-method">И-мэйл хаяг</Label>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="phone" id="signup-phone-method" />
+                        <Label htmlFor="signup-phone-method">Утасны дугаар (8 орон, Монгол)</Label>
+                      </div>
+                    </RadioGroup>
+                  </div>
+
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
                       <Label htmlFor="username">Хэрэглэгчийн нэр</Label>
@@ -244,21 +354,23 @@ export const Auth = () => {
                     </div>
                   </div>
 
-                  <div className="space-y-2">
-                    <Label htmlFor="signup-email">И-мэйл хаяг</Label>
-                    <div className="relative">
-                      <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                      <Input
-                        id="signup-email"
-                        type="email"
-                        placeholder="your@email.com"
-                        className="pl-10"
-                        value={signupData.email}
-                        onChange={(e) => setSignupData(prev => ({ ...prev, email: e.target.value }))}
-                        required
-                      />
+                  {authMethod === "email" ? (
+                    <div className="space-y-2">
+                      <Label htmlFor="signup-email">И-мэйл хаяг</Label>
+                      <div className="relative">
+                        <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                        <Input
+                          id="signup-email"
+                          type="email"
+                          placeholder="your@email.com"
+                          className="pl-10"
+                          value={signupData.email}
+                          onChange={(e) => setSignupData(prev => ({ ...prev, email: e.target.value }))}
+                          required={authMethod === "email"}
+                        />
+                      </div>
                     </div>
-                  </div>
+                  ) : null}
 
                   <div className="space-y-2">
                     <Label htmlFor="signup-password">Нууц үг</Label>
@@ -310,13 +422,19 @@ export const Auth = () => {
                     <Label htmlFor="phoneNumber">Утасны дугаар</Label>
                     <div className="relative">
                       <Phone className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                      <Input
-                        id="phoneNumber"
-                        placeholder="99123456"
-                        className="pl-10"
-                        value={signupData.phoneNumber}
-                        onChange={(e) => setSignupData(prev => ({ ...prev, phoneNumber: e.target.value }))}
-                      />
+                      <div className="flex">
+                        <span className="bg-muted px-3 py-2 border border-r-0 rounded-l-md text-muted-foreground">+976</span>
+                        <Input
+                          id="phoneNumber"
+                          type="tel"
+                          placeholder="12345678"
+                          className="rounded-l-none"
+                          maxLength={8}
+                          value={signupData.phoneNumber}
+                          onChange={(e) => setSignupData(prev => ({ ...prev, phoneNumber: e.target.value.replace(/\D/g, '') }))}
+                          required={authMethod === "phone"}
+                        />
+                      </div>
                     </div>
                   </div>
 
@@ -336,7 +454,7 @@ export const Auth = () => {
                         onClick={() => setShowTerms(true)}
                         className="text-primary underline"
                       >
-                        Үйлчилгээний нөхцөл болон Нууцлалын бодлого
+                        Үйлчилгээний нөхцөл, Нууцлалын бодлого болон төлбөрийн нөхцөл
                       </button>
                       -той зөвшөөрч байна
                     </label>
@@ -399,17 +517,24 @@ export const Auth = () => {
               </div>
 
               <div>
-                <h4 className="font-semibold">5. Татгалзал</h4>
-                <p>• Бид зээл олгодоггүй. Зөвхөн мэдээлэл өгөх зорилготой.</p>
-                <p>• Төлбөр (5,000₮) нь шинжилгээний ажлын төлөө.</p>
-                <p>• Бүх төлбөр буцаагдахгүй.</p>
+                <h4 className="font-semibold">5. Төлбөрийн нөхцөл</h4>
+                <p>• Зээлийн тооцоололын төлбөр: 3,000₮</p>
+                <p>• Энэ төлбөр нь зөвхөн зээлийн боломжийн шинжилгээнд ашиглагдана</p>
+                <p>• Төлбөр нь буцаагдахгүй</p>
+                <p>• Шинжилгээ эхлэсний дараа бүх төлбөр буцаагдахгүй</p>
+              </div>
+
+              <div>
+                <h4 className="font-semibold">6. Утасны дугаараар бүртгэл</h4>
+                <p>• Утасны дугаараар бүртгүүлэхэд 8 оронтой дугаар ашиглана</p>
+                <p>• Зөвхөн Монгол улсын утасны дугаар хүлээн зөвшөөрөгдөнө</p>
+                <p>• Зээлийн тооцоололын өмнө баталгаажуулалт шаардлагатай</p>
               </div>
 
               <div>
                 <h4 className="font-semibold">Үйлчилгээний нөхцөл</h4>
                 <p>Энэ үйлчилгээг ашигласнаар та дараах зүйлийг зөвшөөрч байна:</p>
-                <p>• Төлбөр (5,000₮) нь зөвхөн зээлийн боломжийн шинжилгээнд</p>
-                <p>• Бид зээл олгохгүй эсвэл баталгаа өгөхгүй</p>
+                <p>• Төлбөр (3,000₮) нь зөвхөн зээлийн боломжийн шинжилгээнд</p>
                 <p>• Шинжилгээний үр дүн зөвхөн мэдээлэл зорилготой</p>
                 <p>• Шинжилгээ эхлэсний дараа бүх төлбөр буцаагдахгүй</p>
               </div>

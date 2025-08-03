@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
+import { PaymentMethods } from "@/components/PaymentMethods";
 import { toast } from "@/hooks/use-toast";
 import { ArrowLeft, AlertTriangle, Copy, CheckCircle, QrCode } from "lucide-react";
 
@@ -13,7 +14,7 @@ export const LoanPayment = () => {
   const [paymentMethod, setPaymentMethod] = useState<"qpay" | "bank" | "">("");
   const [isProcessing, setIsProcessing] = useState(false);
 
-  const analysisfee = 5000;
+  const analysisfee = 3000;
 
   const bankDetails = {
     accountNumber: "5001234567",
@@ -100,7 +101,6 @@ export const LoanPayment = () => {
                 <p className="text-2xl font-bold text-foreground mb-2">{analysisfee.toLocaleString()}₮</p>
                 <div className="text-sm space-y-1">
                   <p>• Энэ төлбөр нь буцаагддаггүй</p>
-                  <p>• Бид зээл олгохыг баталгаажуулдаггүй</p>
                   <p>• Зөвхөн мэдээллийн зорилготой шинжилгээ</p>
                 </div>
               </div>
@@ -234,6 +234,9 @@ export const LoanPayment = () => {
             </CardContent>
           </Card>
         )}
+
+        {/* Payment Methods Recommendation */}
+        <PaymentMethods />
 
         {/* Agreement and Proceed */}
         <Card className="neu-card">

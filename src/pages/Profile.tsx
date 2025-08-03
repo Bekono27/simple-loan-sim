@@ -301,8 +301,8 @@ export const Profile = () => {
 
         {/* App Info */}
         <div className="text-center text-sm text-muted-foreground">
-          <p>Simpleloan Mongolia v1.0</p>
-          <p>© 2024 Бүх эрх хуулиар хамгаалагдсан</p>
+          <p>FACT LLC - FACT Loan v1.0</p>
+          <p>© 2025 Бүх эрх хуулиар хамгаалагдсан</p>
         </div>
       </div>
     </Layout>
