@@ -5,31 +5,24 @@ import { CreditCard, Smartphone, Building2, QrCode } from "lucide-react";
 export const PaymentMethods = () => {
   const paymentMethods = [
     {
-      name: "QPay",
-      icon: QrCode,
-      description: "Монголын хамгийн том цахим төлбөрийн систем",
-      advantages: ["Хурдан", "Аюулгүй", "24/7 боломжтой"],
-      recommended: true
-    },
-    {
       name: "Банкны шилжүүлэг",
       icon: Building2,
       description: "Дансны дугаараар шууд шилжүүлэг",
-      advantages: ["Найдвартай", "Бүх банктай холбогдоно", "Томоохон дүнд тохиромжтой"],
-      recommended: false
-    },
-    {
-      name: "Картын төлбөр",
-      icon: CreditCard,
-      description: "Visa, MasterCard картаар төлбөр",
-      advantages: ["Олон улсын карт", "Хурдан", "Автомат баталгаажуулалт"],
+      advantages: ["Найдвартай", "Бүх банктай холбогдоно", "Админы баталгаажуулалт"],
       recommended: true
     },
     {
-      name: "Гар утасны төлбөр",
-      icon: Smartphone,
-      description: "Гар утасны дансаас хасах",
-      advantages: ["Хялбар", "Гар утсанд байгаа мөнгө", "Шуурхай"],
+      name: "QPay / QR код",
+      icon: QrCode,
+      description: "Цахим төлбөрийн систем",
+      advantages: ["Хурдан", "Аюулгүй", "Тун удахгүй"],
+      recommended: false
+    },
+    {
+      name: "Visa карт",
+      icon: CreditCard,
+      description: "Кредит картаар төлбөр",
+      advantages: ["Олон улсын карт", "Хурдан", "Тун удахгүй"],
       recommended: false
     }
   ];
@@ -74,11 +67,15 @@ export const PaymentMethods = () => {
       <div className="bg-muted/50 p-4 rounded-lg">
         <h4 className="font-medium mb-2">Төлбөрийн аргын талаарх зөвлөгөө:</h4>
         <ul className="text-sm text-muted-foreground space-y-1">
-          <li>• <strong>QPay</strong> - Хамгийн хурдан бөгөөд аюулгүй</li>
-          <li>• <strong>Банкны шилжүүлэг</strong> - Томоохон дүнд тохиромжтой</li>
-          <li>• <strong>Картын төлбөр</strong> - Олон улсын карт байгаа бол</li>
-          <li>• <strong>Утасны төлбөр</strong> - Хамгийн хялбар арга</li>
+          <li>• <strong>Банкны шилжүүлэг</strong> - Одоо боломжтой, админы баталгаажуулалт</li>
+          <li>• <strong>QPay</strong> - Тун удахгүй нэмэгдэнэ</li>
+          <li>• <strong>Visa карт</strong> - Тун удахгүй нэмэгдэнэ</li>
         </ul>
+        <div className="mt-3 p-3 bg-blue-50 rounded-lg">
+          <p className="text-xs text-blue-700">
+            <strong>Админы баталгаажуулалт:</strong> Банкны шилжүүлгийн төлбөрийг админ 24 цагийн дотор шалгаж баталгаажуулна.
+          </p>
+        </div>
       </div>
     </div>
   );

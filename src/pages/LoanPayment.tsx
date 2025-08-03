@@ -6,12 +6,13 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { PaymentMethods } from "@/components/PaymentMethods";
 import { toast } from "@/hooks/use-toast";
-import { ArrowLeft, AlertTriangle, Copy, CheckCircle, QrCode } from "lucide-react";
+import { ArrowLeft, AlertTriangle, Copy, CheckCircle, QrCode, CreditCard, Building2 } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
 
 export const LoanPayment = () => {
   const navigate = useNavigate();
   const [agreedToPay, setAgreedToPay] = useState(false);
-  const [paymentMethod, setPaymentMethod] = useState<"qpay" | "bank" | "">("");
+  const [paymentMethod, setPaymentMethod] = useState<"qpay" | "bank" | "visa" | "">("");
   const [isProcessing, setIsProcessing] = useState(false);
 
   const analysisfee = 3000;
@@ -31,7 +32,7 @@ export const LoanPayment = () => {
     });
   };
 
-  const handleProceedAfterPayment = () => {
+  const handleProceedAfterPayment = async () => {
     if (!agreedToPay) {
       toast({
         title: "Алдаа",
@@ -41,24 +42,94 @@ export const LoanPayment = () => {
       return;
     }
 
+    if (paymentMethod === "visa") {
+      toast({
+        title: "Тун удахгүй",
+        description: "Visa картын төлбөр тун удахгүй нэмэгдэнэ",
+        variant: "destructive"
+      });
+      return;
+    }
+
     setIsProcessing(true);
 
-    // Update application status
-    const existingApp = localStorage.getItem("loanApplication");
-    if (existingApp) {
+    try {
+      // Get current user
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (!user) {
+        toast({
+          title: "Алдаа",
+          description: "Нэвтэрч орно уу",
+          variant: "destructive"
+        });
+        setIsProcessing(false);
+        return;
+      }
+
+      // Get loan application
+      const existingApp = localStorage.getItem("loanApplication");
+      if (!existingApp) {
+        toast({
+          title: "Алдаа", 
+          description: "Зээлийн өргөдөл олдсонгүй",
+          variant: "destructive"
+        });
+        setIsProcessing(false);
+        return;
+      }
+
       const appData = JSON.parse(existingApp);
-      appData.status = "payment_confirmed";
+      
+      // Create payment verification record
+      const { error } = await supabase
+        .from('payment_verifications')
+        .insert({
+          user_id: user.id,
+          loan_application_id: appData.id || null,
+          payment_method: paymentMethod,
+          reference_number: bankDetails.reference,
+          amount: analysisfee,
+          status: 'pending'
+        });
+
+      if (error) {
+        console.error('Payment verification error:', error);
+        toast({
+          title: "Алдаа",
+          description: "Төлбөрийн мэдээлэл хадгалахад алдаа гарлаа",
+          variant: "destructive"
+        });
+        setIsProcessing(false);
+        return;
+      }
+
+      // Update application status
+      appData.status = "payment_submitted";
       appData.paymentMethod = paymentMethod;
       appData.paymentDate = new Date().toISOString();
       appData.referenceNumber = bankDetails.reference;
       localStorage.setItem("loanApplication", JSON.stringify(appData));
-    }
 
-    // Simulate processing time
-    setTimeout(() => {
+      toast({
+        title: "Амжилттай",
+        description: "Төлбөрийн мэдээлэл админд илгээгдлээ. Баталгаажуулалтыг хүлээнэ үү."
+      });
+
+      // Simulate processing time
+      setTimeout(() => {
+        setIsProcessing(false);
+        navigate("/loan-result");
+      }, 2000);
+    } catch (error) {
+      console.error('Error:', error);
+      toast({
+        title: "Алдаа",
+        description: "Алдаа гарлаа. Дахин оролдоно уу.",
+        variant: "destructive"
+      });
       setIsProcessing(false);
-      navigate("/loan-result");
-    }, 3000);
+    }
   };
 
   if (isProcessing) {
@@ -113,8 +184,8 @@ export const LoanPayment = () => {
           <CardHeader>
             <CardTitle>Төлбөрийн арга сонгох</CardTitle>
           </CardHeader>
-          <CardContent className="space-y-4">
-            {/* QPay Option */}
+          <CardContent className="space-y-3">
+            {/* QR Code / QPay Option */}
             <div 
               onClick={() => setPaymentMethod("qpay")}
               className={`p-4 border rounded-lg cursor-pointer transition-colors ${
@@ -127,12 +198,13 @@ export const LoanPayment = () => {
                 <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center">
                   <QrCode className="w-5 h-5 text-primary" />
                 </div>
-                <div>
-                  <h3 className="font-medium">QPay / Цахим шилжүүлэг</h3>
-                  <p className="text-sm text-muted-foreground">Хурдан бөгөөд аюулгүй</p>
+                <div className="flex-1">
+                  <h3 className="font-medium">QR код / QPay</h3>
+                  <p className="text-sm text-muted-foreground">Тун удахгүй</p>
                 </div>
+                <div className="text-xs bg-muted px-2 py-1 rounded">Удахгүй</div>
                 {paymentMethod === "qpay" && (
-                  <CheckCircle className="w-5 h-5 text-primary ml-auto" />
+                  <CheckCircle className="w-5 h-5 text-primary" />
                 )}
               </div>
             </div>
@@ -148,14 +220,39 @@ export const LoanPayment = () => {
             >
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center">
-                  <span className="text-sm font-bold text-primary">₮</span>
+                  <Building2 className="w-5 h-5 text-primary" />
                 </div>
-                <div>
+                <div className="flex-1">
                   <h3 className="font-medium">Банкны шилжүүлэг</h3>
                   <p className="text-sm text-muted-foreground">Дансаас данс руу</p>
                 </div>
+                <div className="text-xs bg-green-100 text-green-800 px-2 py-1 rounded">Боломжтой</div>
                 {paymentMethod === "bank" && (
-                  <CheckCircle className="w-5 h-5 text-primary ml-auto" />
+                  <CheckCircle className="w-5 h-5 text-primary" />
+                )}
+              </div>
+            </div>
+
+            {/* Visa Card Option */}
+            <div 
+              onClick={() => setPaymentMethod("visa")}
+              className={`p-4 border rounded-lg cursor-pointer transition-colors ${
+                paymentMethod === "visa" 
+                  ? "border-primary bg-primary/5" 
+                  : "border-border hover:border-primary/50"
+              }`}
+            >
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center">
+                  <CreditCard className="w-5 h-5 text-primary" />
+                </div>
+                <div className="flex-1">
+                  <h3 className="font-medium">Visa карт</h3>
+                  <p className="text-sm text-muted-foreground">Кредит карт</p>
+                </div>
+                <div className="text-xs bg-muted px-2 py-1 rounded">Удахгүй</div>
+                {paymentMethod === "visa" && (
+                  <CheckCircle className="w-5 h-5 text-primary" />
                 )}
               </div>
             </div>
@@ -163,11 +260,11 @@ export const LoanPayment = () => {
         </Card>
 
         {/* Payment Details */}
-        {paymentMethod && (
+        {paymentMethod && paymentMethod !== "visa" && (
           <Card className="neu-card mb-6">
             <CardHeader>
               <CardTitle>
-                {paymentMethod === "qpay" ? "QPay QR код" : "Банкны мэдээлэл"}
+                {paymentMethod === "qpay" ? "QR код мэдээлэл" : "Банкны мэдээлэл"}
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -177,7 +274,7 @@ export const LoanPayment = () => {
                     <QrCode className="w-24 h-24 text-primary" />
                   </div>
                   <p className="text-sm text-muted-foreground mb-4">
-                    Дээрх QR кодыг QPay аппаар уншуулна уу
+                    QR код тун удахгүй нэмэгдэнэ
                   </p>
                   <div className="p-3 bg-muted rounded-lg">
                     <p className="text-sm font-medium">Гүйлгээний утга</p>
@@ -228,6 +325,14 @@ export const LoanPayment = () => {
                         <Copy className="w-4 h-4" />
                       </Button>
                     </div>
+                  </div>
+                  
+                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mt-4">
+                    <h4 className="text-sm font-medium text-blue-900 mb-2">Админы баталгаажуулалт</h4>
+                    <p className="text-xs text-blue-700">
+                      Төлбөр хийсний дараа админ таны төлбөрийг шалгаж баталгаажуулна. 
+                      Энэ нь 24 цагийн дотор хийгдэнэ.
+                    </p>
                   </div>
                 </div>
               )}
