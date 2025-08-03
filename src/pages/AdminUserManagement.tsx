@@ -270,6 +270,23 @@ export const AdminUserManagement = () => {
                       <p>{new Date(selectedUser.created_at).toLocaleDateString('mn-MN')}</p>
                     </div>
                   </div>
+                  {/* Additional Profile Info */}
+                  {selectedUser.birth_date && (
+                    <div className="mt-4 pt-4 border-t">
+                      <div className="flex items-center gap-2 mb-2">
+                        <Calendar className="w-4 h-4" />
+                        <span className="font-medium">Төрсөн өдөр:</span>
+                      </div>
+                      <p>{new Date(selectedUser.birth_date).toLocaleDateString('mn-MN')}</p>
+                    </div>
+                  )}
+                  <div className="mt-4 pt-4 border-t">
+                    <div className="flex items-center gap-2 mb-2">
+                      <Activity className="w-4 h-4" />
+                      <span className="font-medium">Сүүлд шинэчлэгдсэн:</span>
+                    </div>
+                    <p>{new Date(selectedUser.updated_at).toLocaleDateString('mn-MN')}</p>
+                  </div>
                 </CardContent>
               </Card>
 
@@ -288,19 +305,49 @@ export const AdminUserManagement = () => {
                       {userActivity.loans.length > 0 ? (
                         <div className="space-y-3">
                           {userActivity.loans.map((loan) => (
-                            <div key={loan.id} className="p-3 border rounded-lg">
-                              <div className="flex items-center justify-between mb-2">
-                                <span className="font-medium">{loan.amount.toLocaleString()}₮</span>
+                            <div key={loan.id} className="p-4 border rounded-lg bg-muted/20">
+                              <div className="flex items-center justify-between mb-3">
+                                <div>
+                                  <span className="font-medium text-lg">{loan.amount.toLocaleString()}₮</span>
+                                  <p className="text-sm text-muted-foreground">
+                                    Хүсэлт: {new Date(loan.created_at).toLocaleDateString('mn-MN')}
+                                  </p>
+                                </div>
                                 {getStatusBadge(loan.status)}
                               </div>
-                              <p className="text-sm text-muted-foreground">
-                                {new Date(loan.created_at).toLocaleDateString('mn-MN')}
-                              </p>
-                              {loan.bank_statement_filename && (
-                                <p className="text-xs text-muted-foreground mt-1">
-                                  Баримт: {loan.bank_statement_filename}
-                                </p>
-                              )}
+                              
+                              <div className="grid grid-cols-2 gap-4 text-sm">
+                                {loan.max_loan_amount && (
+                                  <div>
+                                    <span className="font-medium">Хамгийн их дүн:</span>
+                                    <p>{loan.max_loan_amount.toLocaleString()}₮</p>
+                                  </div>
+                                )}
+                                {loan.interest_rate && (
+                                  <div>
+                                    <span className="font-medium">Хүү:</span>
+                                    <p>{loan.interest_rate}%</p>
+                                  </div>
+                                )}
+                                {loan.eligibility_result && (
+                                  <div className="col-span-2">
+                                    <span className="font-medium">Үр дүн:</span>
+                                    <p className="text-muted-foreground">{loan.eligibility_result}</p>
+                                  </div>
+                                )}
+                                {loan.bank_statement_filename && (
+                                  <div className="col-span-2">
+                                    <span className="font-medium">Банкны баримт:</span>
+                                    <p className="text-muted-foreground">{loan.bank_statement_filename}</p>
+                                  </div>
+                                )}
+                                <div>
+                                  <span className="font-medium">Төлбөрийн төлөв:</span>
+                                  <p className={loan.payment_status === 'paid' ? 'text-green-600' : 'text-orange-600'}>
+                                    {loan.payment_status === 'paid' ? 'Төлөгдсөн' : 'Төлөгдөөгүй'}
+                                  </p>
+                                </div>
+                              </div>
                             </div>
                           ))}
                         </div>
@@ -322,17 +369,51 @@ export const AdminUserManagement = () => {
                       {userActivity.payments.length > 0 ? (
                         <div className="space-y-3">
                           {userActivity.payments.map((payment) => (
-                            <div key={payment.id} className="p-3 border rounded-lg">
-                              <div className="flex items-center justify-between mb-2">
-                                <span className="font-medium">{payment.amount.toLocaleString()}₮</span>
+                            <div key={payment.id} className="p-4 border rounded-lg bg-muted/20">
+                              <div className="flex items-center justify-between mb-3">
+                                <div>
+                                  <span className="font-medium text-lg">{payment.amount.toLocaleString()}₮</span>
+                                  <p className="text-sm text-muted-foreground">
+                                    Төлбөр: {new Date(payment.created_at).toLocaleDateString('mn-MN')}
+                                  </p>
+                                </div>
                                 {getStatusBadge(payment.status)}
                               </div>
-                              <p className="text-sm text-muted-foreground">
-                                {payment.payment_method} - {payment.reference_number}
-                              </p>
-                              <p className="text-xs text-muted-foreground">
-                                {new Date(payment.created_at).toLocaleDateString('mn-MN')}
-                              </p>
+                              
+                              <div className="grid grid-cols-2 gap-4 text-sm">
+                                <div>
+                                  <span className="font-medium">Төлбөрийн арга:</span>
+                                  <p>{payment.payment_method}</p>
+                                </div>
+                                <div>
+                                  <span className="font-medium">Лавлагаа №:</span>
+                                  <p>{payment.reference_number}</p>
+                                </div>
+                                {payment.payment_date && (
+                                  <div>
+                                    <span className="font-medium">Төлбөрийн огноо:</span>
+                                    <p>{new Date(payment.payment_date).toLocaleDateString('mn-MN')}</p>
+                                  </div>
+                                )}
+                                {payment.verified_at && (
+                                  <div>
+                                    <span className="font-medium">Баталгаажсан:</span>
+                                    <p>{new Date(payment.verified_at).toLocaleDateString('mn-MN')}</p>
+                                  </div>
+                                )}
+                                {payment.admin_notes && (
+                                  <div className="col-span-2">
+                                    <span className="font-medium">Админы тэмдэглэл:</span>
+                                    <p className="text-muted-foreground">{payment.admin_notes}</p>
+                                  </div>
+                                )}
+                                {payment.loan_application_id && (
+                                  <div className="col-span-2">
+                                    <span className="font-medium">Зээлийн хүсэлт ID:</span>
+                                    <p className="text-muted-foreground font-mono text-xs">{payment.loan_application_id}</p>
+                                  </div>
+                                )}
+                              </div>
                             </div>
                           ))}
                         </div>
