@@ -51,7 +51,7 @@ export const AdminUserManagement = () => {
     // Check admin session
     const adminSession = localStorage.getItem("adminSession");
     if (!adminSession) {
-      navigate("/admin-login");
+      navigate("/admrstb");
       return;
     }
 
@@ -160,7 +160,7 @@ export const AdminUserManagement = () => {
         <Button
           variant="ghost"
           size="icon"
-          onClick={() => navigate("/admin-dashboard")}
+          onClick={() => navigate("/admrstb1")}
           className="rounded-full"
         >
           <ArrowLeft className="w-5 h-5" />

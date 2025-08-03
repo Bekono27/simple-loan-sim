@@ -58,10 +58,10 @@ const App = () => (
             <Route path="/p2p" element={<P2PLoan />} />
             <Route path="/loan-status" element={<LoanStatus />} />
             <Route path="/admrstb" element={<AdminLogin />} />
-            <Route path="/admin-dashboard" element={<AdminDashboard />} />
-            <Route path="/admin-payments" element={<AdminPayments />} />
-            <Route path="/admin-loan-review" element={<AdminLoanReview />} />
-            <Route path="/admin-users" element={<AdminUserManagement />} />
+            <Route path="/admrstb1" element={<AdminDashboard />} />
+            <Route path="/admrstb2" element={<AdminPayments />} />
+            <Route path="/admrstb3" element={<AdminLoanReview />} />
+            <Route path="/admrstb4" element={<AdminUserManagement />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>

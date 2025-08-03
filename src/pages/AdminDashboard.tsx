@@ -40,7 +40,7 @@ export const AdminDashboard = () => {
     // Check admin session
     const adminSession = localStorage.getItem("adminSession");
     if (!adminSession) {
-      navigate("/admin-login");
+      navigate("/admrstb");
       return;
     }
 
@@ -48,7 +48,7 @@ export const AdminDashboard = () => {
     // Check if session is expired (24 hours)
     if (Date.now() - session.timestamp > 24 * 60 * 60 * 1000) {
       localStorage.removeItem("adminSession");
-      navigate("/admin-login");
+      navigate("/admrstb");
       return;
     }
 
@@ -99,7 +99,7 @@ export const AdminDashboard = () => {
 
   const handleLogout = () => {
     localStorage.removeItem("adminSession");
-    navigate("/admin-login");
+    navigate("/admrstb");
   };
 
   if (loading) {
@@ -224,7 +224,7 @@ export const AdminDashboard = () => {
               <p className="text-muted-foreground mb-4">
                 Хэрэглэгчдийн төлбөрийг шалгаж баталгаажуулах
               </p>
-              <Button onClick={() => navigate("/admin-payments")} className="w-full mb-2">
+              <Button onClick={() => navigate("/admrstb2")} className="w-full mb-2">
                 Төлбөр шалгах
                 {stats.pendingPayments > 0 && (
                   <Badge variant="destructive" className="ml-2">
@@ -232,10 +232,10 @@ export const AdminDashboard = () => {
                   </Badge>
                 )}
               </Button>
-              <Button onClick={() => navigate("/admin-loan-review")} variant="outline" className="w-full mb-2">
+              <Button onClick={() => navigate("/admrstb3")} variant="outline" className="w-full mb-2">
                 Факт зээлийн хүсэлт шалгах
               </Button>
-              <Button onClick={() => navigate("/admin-users")} variant="outline" className="w-full">
+              <Button onClick={() => navigate("/admrstb4")} variant="outline" className="w-full">
                 Хэрэглэгчийн удирдлага
               </Button>
             </CardContent>

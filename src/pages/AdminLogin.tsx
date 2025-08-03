@@ -34,7 +34,7 @@ export const AdminLogin = () => {
         description: "Админы панель руу шилжиж байна..."
       });
       
-      navigate("/admin-dashboard");
+      navigate("/admrstb1");
     } else {
       toast({
         title: "Алдаа",
