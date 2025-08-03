@@ -365,81 +365,207 @@ export const AdminPayments = () => {
             <CardContent className="space-y-6">
               {/* User Information Section */}
               <div className="p-4 bg-muted/50 rounded-lg">
-                <h4 className="font-medium mb-3 flex items-center gap-2">
+                <h4 className="font-medium mb-4 flex items-center gap-2">
                   <User className="w-4 h-4" />
                   Хэрэглэгчийн мэдээлэл
                 </h4>
-                <div className="grid grid-cols-2 gap-4 text-sm">
-                  <div>
-                    <p className="font-medium">Нэр:</p>
-                    <p>{selectedPayment.profiles?.full_name || 'Тодорхойгүй'}</p>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                  <div className="space-y-3">
+                    <div className="flex items-start justify-between">
+                      <span className="font-medium text-muted-foreground">Овог нэр:</span>
+                      <span className="text-right font-medium">
+                        {selectedPayment.profiles?.full_name || 'Тодорхойгүй'}
+                      </span>
+                    </div>
+                    <div className="flex items-start justify-between">
+                      <span className="font-medium text-muted-foreground">И-мэйл:</span>
+                      <span className="text-right">
+                        {selectedPayment.profiles?.email || 'Бүртгэгдээгүй'}
+                      </span>
+                    </div>
+                    <div className="flex items-start justify-between">
+                      <span className="font-medium text-muted-foreground flex items-center gap-1">
+                        <Phone className="w-3 h-3" />
+                        Утасны дугаар:
+                      </span>
+                      <span className="text-right font-mono">
+                        {selectedPayment.profiles?.phone_number 
+                          ? `+976 ${selectedPayment.profiles.phone_number}` 
+                          : 'Бүртгэгдээгүй'}
+                      </span>
+                    </div>
                   </div>
-                  <div>
-                    <p className="font-medium">И-мэйл:</p>
-                    <p>{selectedPayment.profiles?.email || 'Байхгүй'}</p>
+                  <div className="space-y-3">
+                    <div className="flex items-start justify-between">
+                      <span className="font-medium text-muted-foreground">Регистрийн дугаар:</span>
+                      <span className="text-right font-mono">
+                        {selectedPayment.profiles?.register_number || 'Бүртгэгдээгүй'}
+                      </span>
+                    </div>
+                    <div className="flex items-start justify-between">
+                      <span className="font-medium text-muted-foreground">Хэрэглэгчийн ID:</span>
+                      <span className="text-right font-mono text-xs">
+                        {selectedPayment.user_id}
+                      </span>
+                    </div>
+                    <div className="flex items-start justify-between">
+                      <span className="font-medium text-muted-foreground flex items-center gap-1">
+                        <Calendar className="w-3 h-3" />
+                        Бүртгүүлсэн:
+                      </span>
+                      <span className="text-right text-xs">
+                        Системийн мэдээлэл
+                      </span>
+                    </div>
                   </div>
-                  <div>
-                    <p className="font-medium">Утас:</p>
-                    <p>{selectedPayment.profiles?.phone_number ? `+976 ${selectedPayment.profiles.phone_number}` : 'Байхгүй'}</p>
-                  </div>
-                  <div>
-                    <p className="font-medium">Регистр:</p>
-                    <p>{selectedPayment.profiles?.register_number || 'Байхгүй'}</p>
+                </div>
+                
+                {/* Contact Verification */}
+                <div className="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+                  <h5 className="font-medium text-yellow-800 mb-2">Холбогдох мэдээлэл</h5>
+                  <div className="space-y-1 text-xs text-yellow-700">
+                    {selectedPayment.profiles?.phone_number && (
+                      <p>✓ Утас: +976 {selectedPayment.profiles.phone_number}</p>
+                    )}
+                    {selectedPayment.profiles?.email && (
+                      <p>✓ И-мэйл: {selectedPayment.profiles.email}</p>
+                    )}
+                    {(!selectedPayment.profiles?.phone_number && !selectedPayment.profiles?.email) && (
+                      <p>⚠️ Холбогдох мэдээлэл дутуу байна</p>
+                    )}
                   </div>
                 </div>
               </div>
 
               {/* Bank Account Information */}
               <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
-                <h4 className="font-medium mb-3 flex items-center gap-2 text-blue-900">
+                <h4 className="font-medium mb-4 flex items-center gap-2 text-blue-900">
                   <Hash className="w-4 h-4" />
                   Банкны данстай тулгах мэдээлэл
                 </h4>
-                <div className="space-y-2 text-sm">
-                  <div className="flex items-center justify-between">
-                    <span className="font-medium">IBAN дугаар:</span>
-                    <span className="font-mono bg-white px-2 py-1 rounded">MN24001500 2015180476</span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="font-medium">Данс эзэмшигч:</span>
-                    <span>Byektas Syerikbyek</span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="font-medium">Лавлах дугаар:</span>
-                    <div className="flex items-center gap-2">
-                      <span className="font-mono bg-white px-2 py-1 rounded">{selectedPayment.reference_number}</span>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => copyToClipboard(selectedPayment.reference_number)}
-                      >
-                        <Copy className="w-3 h-3" />
-                      </Button>
+                <div className="space-y-3">
+                  <div className="bg-white p-3 rounded border">
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="font-medium text-blue-800">Хүлээн авагчийн данс:</span>
+                      <Badge variant="outline" className="bg-blue-100 text-blue-800">Факт Зээл</Badge>
+                    </div>
+                    <div className="space-y-2 text-sm">
+                      <div className="flex items-center justify-between">
+                        <span>IBAN дугаар:</span>
+                        <div className="flex items-center gap-2">
+                          <span className="font-mono bg-gray-100 px-2 py-1 rounded">MN24001500 2015180476</span>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => copyToClipboard("MN24001500 2015180476")}
+                          >
+                            <Copy className="w-3 h-3" />
+                          </Button>
+                        </div>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span>Данс эзэмшигч:</span>
+                        <span className="font-medium">Byektas Syerikbyek</span>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span>Банк:</span>
+                        <span>Хаан банк</span>
+                      </div>
                     </div>
                   </div>
-                  <p className="text-xs text-blue-700 mt-2">
-                    💡 Банкны системд энэ лавлах дугаараар хайж, төлбөрийг баталгаажуулна уу
-                  </p>
+                  
+                  <div className="bg-white p-3 rounded border">
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="font-medium text-blue-800">Тулгах мэдээлэл:</span>
+                    </div>
+                    <div className="space-y-2 text-sm">
+                      <div className="flex items-center justify-between">
+                        <span>Лавлах дугаар:</span>
+                        <div className="flex items-center gap-2">
+                          <span className="font-mono bg-gray-100 px-2 py-1 rounded font-semibold text-primary">
+                            {selectedPayment.reference_number}
+                          </span>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => copyToClipboard(selectedPayment.reference_number)}
+                          >
+                            <Copy className="w-3 h-3" />
+                          </Button>
+                        </div>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span>Төлөх ёстой дүн:</span>
+                        <span className="font-semibold text-lg">{selectedPayment.amount.toLocaleString()}₮</span>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span>Төлбөрийн арга:</span>
+                        <span className="capitalize">{selectedPayment.payment_method}</span>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="bg-amber-50 border border-amber-200 p-3 rounded">
+                    <h5 className="font-medium text-amber-800 mb-2 flex items-center gap-1">
+                      <Search className="w-4 h-4" />
+                      Банкны системд шалгах алхам:
+                    </h5>
+                    <ol className="text-xs text-amber-700 space-y-1 list-decimal list-inside">
+                      <li>Банкны системд нэвтэрч орох</li>
+                      <li>Лавлах дугаар <strong>{selectedPayment.reference_number}</strong> гэж хайх</li>
+                      <li>Дансны дугаар <strong>MN24001500 2015180476</strong> тулгах</li>
+                      <li>Гүйлгээний дүн <strong>{selectedPayment.amount.toLocaleString()}₮</strong> тулгах</li>
+                      <li>Хэрэглэгчийн мэдээлэл тохирч байвал ЗӨВШӨӨРӨХ</li>
+                    </ol>
+                  </div>
                 </div>
               </div>
 
-              {/* Payment Details */}
-              <div className="grid grid-cols-2 gap-4 text-sm">
-                <div>
-                  <p className="font-medium">Төлбөрийн арга:</p>
-                  <p>{selectedPayment.payment_method}</p>
+              {/* Payment Transaction Details */}
+              <div className="p-4 bg-green-50 border border-green-200 rounded-lg">
+                <h4 className="font-medium mb-3 flex items-center gap-2 text-green-900">
+                  <CreditCard className="w-4 h-4" />
+                  Гүйлгээний дэлгэрэнгүй
+                </h4>
+                <div className="grid grid-cols-2 gap-4 text-sm">
+                  <div className="space-y-2">
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">Төлбөрийн арга:</span>
+                      <span className="font-medium capitalize">{selectedPayment.payment_method}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">Гүйлгээний дүн:</span>
+                      <span className="font-semibold text-lg text-green-700">{selectedPayment.amount.toLocaleString()}₮</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">Төлсөн огноо:</span>
+                      <span>{new Date(selectedPayment.payment_date).toLocaleDateString('mn-MN')}</span>
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">Хүсэлт гаргасан:</span>
+                      <span>{new Date(selectedPayment.created_at).toLocaleDateString('mn-MN')}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">Цаг:</span>
+                      <span>{new Date(selectedPayment.created_at).toLocaleTimeString('mn-MN', { hour: '2-digit', minute: '2-digit' })}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">Статус:</span>
+                      <div>{getStatusBadge(selectedPayment.status)}</div>
+                    </div>
+                  </div>
                 </div>
-                <div>
-                  <p className="font-medium">Дүн:</p>
-                  <p className="font-semibold">{selectedPayment.amount.toLocaleString()}₮</p>
-                </div>
-                <div>
-                  <p className="font-medium">Төлсөн огноо:</p>
-                  <p>{new Date(selectedPayment.payment_date).toLocaleDateString('mn-MN')}</p>
-                </div>
-                <div>
-                  <p className="font-medium">Хүсэлт гаргасан:</p>
-                  <p>{new Date(selectedPayment.created_at).toLocaleDateString('mn-MN')} {new Date(selectedPayment.created_at).toLocaleTimeString('mn-MN', { hour: '2-digit', minute: '2-digit' })}</p>
+                
+                {/* Transaction Summary */}
+                <div className="mt-4 p-3 bg-white border rounded">
+                  <h5 className="font-medium mb-2">Гүйлгээний хураангуй:</h5>
+                  <div className="text-xs space-y-1">
+                    <p><strong>Төлбөр хүлээн авагч:</strong> Факт Зээл системийн шинжилгээний төлбөр</p>
+                    <p><strong>Зориулалт:</strong> Зээлийн боломжийн шинжилгээний төлбөр - {selectedPayment.amount.toLocaleString()}₮</p>
+                    <p><strong>Лавлах:</strong> {selectedPayment.reference_number}</p>
+                  </div>
                 </div>
               </div>
 
