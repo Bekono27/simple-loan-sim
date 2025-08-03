@@ -13,7 +13,7 @@ export const BottomNavigation = () => {
 
   const navItems: NavItem[] = [
     { icon: Wallet, label: "Хэтэвч", path: "/dashboard" },
-    { icon: CreditCard, label: "Зээл", path: "/loan-eligibility" },
+    { icon: CreditCard, label: "Факт зээл", path: "/loan-eligibility" },
     { icon: ShoppingBag, label: "Үйлчилгээ", path: "/simple-buy" },
     { icon: User, label: "Профайл", path: "/profile" },
   ];

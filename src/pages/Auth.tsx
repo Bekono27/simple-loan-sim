@@ -18,11 +18,12 @@ export const Auth = () => {
   const [loading, setLoading] = useState(false);
   const [showTerms, setShowTerms] = useState(false);
   const [agreedToTerms, setAgreedToTerms] = useState(false);
-  const [authMethod, setAuthMethod] = useState<"email" | "phone">("email");
+  const [authMethod, setAuthMethod] = useState<"email" | "phone" | "username">("email");
 
   const [loginData, setLoginData] = useState({
     email: "",
     phone: "",
+    username: "",
     password: ""
   });
 
@@ -75,6 +76,34 @@ export const Auth = () => {
           phone: `+976${loginData.phone}`,
           password: loginData.password,
         };
+      } else if (authMethod === "username") {
+        // For username login, we'll use a simpler approach
+        // Try to find the user's email through the profiles table
+        const { data: profiles, error: profileError } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('username', loginData.username)
+          .single();
+
+        if (profileError || !profiles) {
+          toast({
+            title: "Алдаа гарлаа",
+            description: "Хэрэглэгчийн нэр олдсонгүй",
+            variant: "destructive"
+          });
+          setLoading(false);
+          return;
+        }
+
+        // Since we can't get the email from profiles, we'll need to store it there
+        // For now, let's show an error message asking users to use email/phone
+        toast({
+          title: "Анхаар",
+          description: "Хэрэглэгчийн нэрээр нэвтрэх одоохондоо боломжгүй. И-мэйл эсвэл утасны дугаараа ашиглана уу.",
+          variant: "destructive"
+        });
+        setLoading(false);
+        return;
       } else {
         authData = {
           email: loginData.email,
@@ -88,7 +117,9 @@ export const Auth = () => {
         toast({
           title: "Алдаа гарлаа",
           description: error.message === "Invalid login credentials" 
-            ? authMethod === "phone" ? "Утас эсвэл нууц үг буруу байна" : "И-мэйл эсвэл нууц үг буруу байна"
+            ? authMethod === "phone" ? "Утас эсвэл нууц үг буруу байна" 
+              : authMethod === "username" ? "Хэрэглэгчийн нэр эсвэл нууц үг буруу байна"
+              : "И-мэйл эсвэл нууц үг буруу байна"
             : "Нэвтрэхэд алдаа гарлаа",
           variant: "destructive"
         });
@@ -180,7 +211,7 @@ export const Auth = () => {
         if (authMethod === "phone") {
           toast({
             title: "Амжилттай бүртгэгдлээ",
-            description: "Зээлийн тооцоолол хийхээс өмнө баталгаажуулна уу"
+            description: "Факт зээлийн тооцоолол хийхээс өмнө баталгаажуулна уу"
           });
           navigate("/loan-eligibility");
         } else {
@@ -206,7 +237,7 @@ export const Auth = () => {
       <div className="w-full max-w-md space-y-6">
         <div className="text-center">
           <h1 className="text-3xl font-bold text-primary">FACT Loan</h1>
-          <p className="text-muted-foreground mt-2">Таны зээлийн платформд тавтай морилно уу</p>
+          <p className="text-muted-foreground mt-2">Таны факт зээлийн платформд тавтай морилно уу</p>
         </div>
 
         <Tabs defaultValue="login" className="w-full">
@@ -227,7 +258,7 @@ export const Auth = () => {
                 <form onSubmit={handleLogin} className="space-y-4">
                   <div className="space-y-3">
                     <Label>Нэвтрэх арга</Label>
-                    <RadioGroup value={authMethod} onValueChange={(value: "email" | "phone") => setAuthMethod(value)}>
+                    <RadioGroup value={authMethod} onValueChange={(value: "email" | "phone" | "username") => setAuthMethod(value)}>
                       <div className="flex items-center space-x-2">
                         <RadioGroupItem value="email" id="email-method" />
                         <Label htmlFor="email-method">И-мэйл хаяг</Label>
@@ -235,6 +266,10 @@ export const Auth = () => {
                       <div className="flex items-center space-x-2">
                         <RadioGroupItem value="phone" id="phone-method" />
                         <Label htmlFor="phone-method">Утасны дугаар (8 орон, Монгол)</Label>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="username" id="username-method" />
+                        <Label htmlFor="username-method">Хэрэглэгчийн нэр</Label>
                       </div>
                     </RadioGroup>
                   </div>
@@ -255,7 +290,7 @@ export const Auth = () => {
                         />
                       </div>
                     </div>
-                  ) : (
+                  ) : authMethod === "phone" ? (
                     <div className="space-y-2">
                       <Label htmlFor="phone">Утасны дугаар</Label>
                       <div className="relative">
@@ -273,6 +308,22 @@ export const Auth = () => {
                             required={authMethod === "phone"}
                           />
                         </div>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="space-y-2">
+                      <Label htmlFor="username">Хэрэглэгчийн нэр</Label>
+                      <div className="relative">
+                        <User className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                        <Input
+                          id="username"
+                          type="text"
+                          placeholder="username"
+                          className="pl-10"
+                          value={loginData.username}
+                          onChange={(e) => setLoginData(prev => ({ ...prev, username: e.target.value }))}
+                          required={authMethod === "username"}
+                        />
                       </div>
                     </div>
                   )}
@@ -314,7 +365,7 @@ export const Auth = () => {
                 <form onSubmit={handleSignup} className="space-y-4">
                   <div className="space-y-3">
                     <Label>Бүртгүүлэх арга</Label>
-                    <RadioGroup value={authMethod} onValueChange={(value: "email" | "phone") => setAuthMethod(value)}>
+                    <RadioGroup value={authMethod} onValueChange={(value: "email" | "phone" | "username") => setAuthMethod(value)}>
                       <div className="flex items-center space-x-2">
                         <RadioGroupItem value="email" id="signup-email-method" />
                         <Label htmlFor="signup-email-method">И-мэйл хаяг</Label>
@@ -322,6 +373,10 @@ export const Auth = () => {
                       <div className="flex items-center space-x-2">
                         <RadioGroupItem value="phone" id="signup-phone-method" />
                         <Label htmlFor="signup-phone-method">Утасны дугаар (8 орон, Монгол)</Label>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="username" id="signup-username-method" />
+                        <Label htmlFor="signup-username-method">Хэрэглэгчийн нэр</Label>
                       </div>
                     </RadioGroup>
                   </div>

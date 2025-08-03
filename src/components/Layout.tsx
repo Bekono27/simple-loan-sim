@@ -34,7 +34,7 @@ export const Layout = ({ children, title, showBack = true, showBottomNav = true 
             {title ? (
               <h1 className="font-semibold text-lg text-foreground">{title}</h1>
             ) : (
-              <h1 className="font-bold text-xl text-primary">Простой Зээл</h1>
+              <h1 className="font-bold text-xl text-primary">Факт Зээл</h1>
             )}
           </div>
           
