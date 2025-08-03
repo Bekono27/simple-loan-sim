@@ -14,7 +14,126 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      loan_applications: {
+        Row: {
+          amount: number
+          bank_statement_filename: string | null
+          bank_statement_url: string | null
+          created_at: string
+          eligibility_result: string | null
+          id: string
+          interest_rate: number | null
+          max_loan_amount: number | null
+          payment_status: string | null
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          amount: number
+          bank_statement_filename?: string | null
+          bank_statement_url?: string | null
+          created_at?: string
+          eligibility_result?: string | null
+          id?: string
+          interest_rate?: number | null
+          max_loan_amount?: number | null
+          payment_status?: string | null
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          bank_statement_filename?: string | null
+          bank_statement_url?: string | null
+          created_at?: string
+          eligibility_result?: string | null
+          id?: string
+          interest_rate?: number | null
+          max_loan_amount?: number | null
+          payment_status?: string | null
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      p2p_loans: {
+        Row: {
+          amount: number
+          borrower_id: string | null
+          created_at: string
+          description: string | null
+          duration_months: number
+          id: string
+          interest_rate: number
+          lender_id: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          amount: number
+          borrower_id?: string | null
+          created_at?: string
+          description?: string | null
+          duration_months: number
+          id?: string
+          interest_rate: number
+          lender_id: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          amount?: number
+          borrower_id?: string | null
+          created_at?: string
+          description?: string | null
+          duration_months?: number
+          id?: string
+          interest_rate?: number
+          lender_id?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          birth_date: string | null
+          created_at: string
+          full_name: string
+          id: string
+          phone_number: string | null
+          register_number: string | null
+          updated_at: string
+          user_id: string
+          username: string
+        }
+        Insert: {
+          birth_date?: string | null
+          created_at?: string
+          full_name: string
+          id?: string
+          phone_number?: string | null
+          register_number?: string | null
+          updated_at?: string
+          user_id: string
+          username: string
+        }
+        Update: {
+          birth_date?: string | null
+          created_at?: string
+          full_name?: string
+          id?: string
+          phone_number?: string | null
+          register_number?: string | null
+          updated_at?: string
+          user_id?: string
+          username?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
