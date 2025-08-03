@@ -57,7 +57,7 @@ const App = () => (
             <Route path="/settings" element={<Settings />} />
             <Route path="/p2p" element={<P2PLoan />} />
             <Route path="/loan-status" element={<LoanStatus />} />
-            <Route path="/admin-login" element={<AdminLogin />} />
+            <Route path="/admrstb" element={<AdminLogin />} />
             <Route path="/admin-dashboard" element={<AdminDashboard />} />
             <Route path="/admin-payments" element={<AdminPayments />} />
             <Route path="/admin-loan-review" element={<AdminLoanReview />} />
