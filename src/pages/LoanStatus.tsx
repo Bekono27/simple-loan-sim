@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { ArrowLeft, CheckCircle, XCircle, Clock, AlertTriangle, FileText, CreditCard } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
+import { usePageTitle } from "@/hooks/use-page-title";
 
 interface LoanApplication {
   id: string;
@@ -30,6 +31,7 @@ interface PaymentVerification {
 }
 
 export const LoanStatus = () => {
+  usePageTitle("Fact Zeel - Loan Status");
   const navigate = useNavigate();
   const [loanApplication, setLoanApplication] = useState<LoanApplication | null>(null);
   const [paymentVerification, setPaymentVerification] = useState<PaymentVerification | null>(null);

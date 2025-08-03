@@ -2,6 +2,7 @@ import { Layout } from "@/components/Layout";
 import { Card } from "@/components/ui/card";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { HelpCircle } from "lucide-react";
+import { usePageTitle } from "@/hooks/use-page-title";
 
 const faqData = [
   {
@@ -47,6 +48,7 @@ const faqData = [
 ];
 
 export const FAQ = () => {
+  usePageTitle("Fact Zeel - FAQ");
   return (
     <Layout title="FAQ">
       <div className="p-4 space-y-6">

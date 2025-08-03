@@ -5,6 +5,7 @@ import { Card } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
+import { usePageTitle } from "@/hooks/use-page-title";
 import { 
   Settings as SettingsIcon, 
   Bell, 
@@ -22,6 +23,7 @@ import {
 } from "lucide-react";
 
 export const Settings = () => {
+  usePageTitle("Fact Zeel - Settings");
   const [language, setLanguage] = useState("mn");
   const [theme, setTheme] = useState("system");
   const [pushNotifications, setPushNotifications] = useState(true);

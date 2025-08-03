@@ -5,6 +5,7 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { QrCode, ShoppingCart, CheckCircle, Store } from "lucide-react";
+import { usePageTitle } from "@/hooks/use-page-title";
 
 const mockPhones = [
   {
@@ -31,6 +32,7 @@ const mockPhones = [
 ];
 
 export const SimpleBuy = () => {
+  usePageTitle("Fact Zeel - Simple Buy");
   const [selectedPhone, setSelectedPhone] = useState<any>(null);
   const [showComingSoon, setShowComingSoon] = useState(false);
   const { toast } = useToast();

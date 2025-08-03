@@ -16,8 +16,10 @@ import {
   CheckCircle,
   AlertTriangle
 } from "lucide-react";
+import { usePageTitle } from "@/hooks/use-page-title";
 
 export const Security = () => {
+  usePageTitle("Fact Zeel - Security");
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");

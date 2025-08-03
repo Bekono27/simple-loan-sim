@@ -8,8 +8,10 @@ import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { QrCode, CreditCard, CheckCircle } from "lucide-react";
+import { usePageTitle } from "@/hooks/use-page-title";
 
 export const Repayment = () => {
+  usePageTitle("Fact Zeel - Repayment");
   const [loanData, setLoanData] = useState<any>(null);
   const [paymentAmount, setPaymentAmount] = useState("");
   const [showQR, setShowQR] = useState(false);

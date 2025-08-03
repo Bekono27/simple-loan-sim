@@ -12,8 +12,10 @@ import { User, Mail, Lock, Phone, Calendar, IdCard, Loader2, Eye, EyeOff } from 
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { validatePassword, checkCommonPasswords, cleanupAuthState } from "@/lib/security";
+import { usePageTitle } from "@/hooks/use-page-title";
 
 export const Auth = () => {
+  usePageTitle("Fact Zeel - Login");
   const navigate = useNavigate();
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);

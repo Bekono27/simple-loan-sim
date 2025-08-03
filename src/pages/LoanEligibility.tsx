@@ -7,8 +7,10 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { ArrowLeft, Upload, FileText, AlertTriangle, Wallet, CreditCard, ShoppingBag, User } from "lucide-react";
+import { usePageTitle } from "@/hooks/use-page-title";
 
 export const LoanEligibility = () => {
+  usePageTitle("Fact Zeel - Loan Eligibility");
   const navigate = useNavigate();
   const [loanAmount, setLoanAmount] = useState("");
   const [bankStatement, setBankStatement] = useState<File | null>(null);

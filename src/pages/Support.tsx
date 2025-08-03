@@ -7,8 +7,10 @@ import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { MessageCircle, Phone, Mail, Clock, CheckCircle } from "lucide-react";
 import { useState } from "react";
+import { usePageTitle } from "@/hooks/use-page-title";
 
 export const Support = () => {
+  usePageTitle("Fact Zeel - Support");
   const [formData, setFormData] = useState({
     name: "",
     email: "",

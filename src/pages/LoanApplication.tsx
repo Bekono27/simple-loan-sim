@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { Calculator, CheckCircle, XCircle, Clock } from "lucide-react";
+import { usePageTitle } from "@/hooks/use-page-title";
 
 interface RepaymentPlan {
   monthlyPayment: number;
@@ -16,6 +17,7 @@ interface RepaymentPlan {
 }
 
 export const LoanApplication = () => {
+  usePageTitle("Fact Zeel - Loan Application");
   const [step, setStep] = useState<"application" | "processing" | "result">("application");
   const [amount, setAmount] = useState("");
   const [term, setTerm] = useState("");

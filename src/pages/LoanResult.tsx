@@ -3,8 +3,10 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ArrowLeft, CheckCircle, AlertTriangle, Download, Share2 } from "lucide-react";
+import { usePageTitle } from "@/hooks/use-page-title";
 
 export const LoanResult = () => {
+  usePageTitle("Fact Zeel - Loan Result");
   const navigate = useNavigate();
   const [applicationData, setApplicationData] = useState<any>(null);
   const [calculatedResult, setCalculatedResult] = useState<any>(null);

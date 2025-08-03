@@ -8,8 +8,10 @@ import { PaymentMethods } from "@/components/PaymentMethods";
 import { toast } from "@/hooks/use-toast";
 import { ArrowLeft, AlertTriangle, Copy, CheckCircle, QrCode, CreditCard, Building2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { usePageTitle } from "@/hooks/use-page-title";
 
 export const LoanPayment = () => {
+  usePageTitle("Fact Zeel - Loan Payment");
   const navigate = useNavigate();
   const [agreedToPay, setAgreedToPay] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState<"qpay" | "bank" | "visa" | "">("");

@@ -11,6 +11,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/components/AuthProvider";
+import { usePageTitle } from "@/hooks/use-page-title";
 import { 
   Users, 
   Plus, 
@@ -25,6 +26,7 @@ import {
 } from "lucide-react";
 
 export const P2PLoan = () => {
+  usePageTitle("Fact Zeel - P2P Loan");
   const [activeTab, setActiveTab] = useState("browse");
   const [p2pLoans, setP2pLoans] = useState<any[]>([]);
   const [myLoans, setMyLoans] = useState<any[]>([]);

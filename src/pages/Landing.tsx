@@ -2,8 +2,10 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { ShieldCheck, Zap, Clock } from "lucide-react";
+import { usePageTitle } from "@/hooks/use-page-title";
 
 export const Landing = () => {
+  usePageTitle("Fact Zeel - Home");
   const navigate = useNavigate();
 
   return (

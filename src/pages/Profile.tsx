@@ -9,6 +9,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/components/AuthProvider";
+import { usePageTitle } from "@/hooks/use-page-title";
 import { 
   User, 
   Phone, 
@@ -25,6 +26,7 @@ import {
 } from "lucide-react";
 
 export const Profile = () => {
+  usePageTitle("Fact Zeel - Profile");
   const [isEditing, setIsEditing] = useState(false);
   const [showTerms, setShowTerms] = useState(false);
   const [profile, setProfile] = useState<any>(null);

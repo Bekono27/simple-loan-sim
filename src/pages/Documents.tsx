@@ -16,8 +16,10 @@ import {
   AlertCircle,
   CheckCircle
 } from "lucide-react";
+import { usePageTitle } from "@/hooks/use-page-title";
 
 export const Documents = () => {
+  usePageTitle("Fact Zeel - Documents");
   const [documents, setDocuments] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);

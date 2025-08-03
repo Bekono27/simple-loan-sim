@@ -8,8 +8,10 @@ import { Eye, EyeOff, CreditCard, TrendingUp, Users, FileText, AlertCircle } fro
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/components/AuthProvider";
 import { useToast } from "@/hooks/use-toast";
+import { usePageTitle } from "@/hooks/use-page-title";
 
 export const Dashboard = () => {
+  usePageTitle("Fact Zeel - Dashboard");
   const navigate = useNavigate();
   const { user, loading: authLoading } = useAuth();
   const { toast } = useToast();
