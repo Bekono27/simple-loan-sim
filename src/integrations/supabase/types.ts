@@ -188,12 +188,15 @@ export type Database = {
         Row: {
           birth_date: string | null
           created_at: string
+          credit_score: number | null
           email: string | null
           full_name: string
           id: string
           phone_number: string | null
           register_number: string | null
           role: Database["public"]["Enums"]["app_role"]
+          score_updated_at: string | null
+          score_updated_by: string | null
           updated_at: string
           user_id: string
           username: string
@@ -201,12 +204,15 @@ export type Database = {
         Insert: {
           birth_date?: string | null
           created_at?: string
+          credit_score?: number | null
           email?: string | null
           full_name: string
           id?: string
           phone_number?: string | null
           register_number?: string | null
           role?: Database["public"]["Enums"]["app_role"]
+          score_updated_at?: string | null
+          score_updated_by?: string | null
           updated_at?: string
           user_id: string
           username: string
@@ -214,12 +220,15 @@ export type Database = {
         Update: {
           birth_date?: string | null
           created_at?: string
+          credit_score?: number | null
           email?: string | null
           full_name?: string
           id?: string
           phone_number?: string | null
           register_number?: string | null
           role?: Database["public"]["Enums"]["app_role"]
+          score_updated_at?: string | null
+          score_updated_by?: string | null
           updated_at?: string
           user_id?: string
           username?: string

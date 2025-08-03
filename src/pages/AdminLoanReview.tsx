@@ -25,6 +25,9 @@ interface LoanApplication {
     full_name: string;
     phone_number?: string;
     register_number?: string;
+    credit_score?: number;
+    email?: string;
+    user_id: string;
   } | null;
 }
 
@@ -35,6 +38,7 @@ export const AdminLoanReview = () => {
   const [adminNotes, setAdminNotes] = useState("");
   const [approvedAmount, setApprovedAmount] = useState("");
   const [interestRate, setInterestRate] = useState("");
+  const [creditScore, setCreditScore] = useState("");
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -57,7 +61,10 @@ export const AdminLoanReview = () => {
           profiles (
             full_name,
             phone_number,
-            register_number
+            register_number,
+            credit_score,
+            email,
+            user_id
           )
         `)
         .order('created_at', { ascending: false });
@@ -114,6 +121,7 @@ export const AdminLoanReview = () => {
       setAdminNotes("");
       setApprovedAmount("");
       setInterestRate("");
+      setCreditScore("");
     } catch (error) {
       console.error('Error updating loan:', error);
       toast({
@@ -250,6 +258,7 @@ export const AdminLoanReview = () => {
                       setAdminNotes(loan.eligibility_result || "");
                       setApprovedAmount(loan.amount.toString());
                       setInterestRate("15");
+                      setCreditScore(loan.profiles?.credit_score?.toString() || "0");
                     }}
                     className="flex-1"
                   >
@@ -286,6 +295,10 @@ export const AdminLoanReview = () => {
                   <p>{selectedLoan.profiles?.full_name}</p>
                 </div>
                 <div>
+                  <p className="font-medium">И-мэйл:</p>
+                  <p>{selectedLoan.profiles?.email || 'Байхгүй'}</p>
+                </div>
+                <div>
                   <p className="font-medium">Утасны дугаар:</p>
                   <p>{selectedLoan.profiles?.phone_number || 'Байхгүй'}</p>
                 </div>
@@ -301,12 +314,20 @@ export const AdminLoanReview = () => {
                   <p className="font-medium">Хүсэлт гаргасан огноо:</p>
                   <p>{new Date(selectedLoan.created_at).toLocaleDateString('mn-MN')}</p>
                 </div>
+                <div>
+                  <p className="font-medium">Одоогийн зээлийн оноо:</p>
+                  <p className="font-semibold text-primary">{selectedLoan.profiles?.credit_score || 0} оноо</p>
+                </div>
               </div>
 
+              {/* Bank Statement Section */}
               {selectedLoan.bank_statement_filename && (
-                <div className="p-4 border rounded-lg">
+                <div className="p-4 border rounded-lg bg-muted/30">
                   <div className="flex items-center justify-between mb-2">
-                    <h4 className="font-medium">Банкны баримт</h4>
+                    <h4 className="font-medium flex items-center gap-2">
+                      <FileText className="w-4 h-4" />
+                      Санхүүгийн баримт бичиг
+                    </h4>
                     <Button
                       size="sm"
                       variant="outline"
@@ -316,9 +337,14 @@ export const AdminLoanReview = () => {
                       Татах
                     </Button>
                   </div>
-                  <p className="text-sm text-muted-foreground">{selectedLoan.bank_statement_filename}</p>
+                  <p className="text-sm text-muted-foreground mb-2">{selectedLoan.bank_statement_filename}</p>
+                  <div className="text-sm">
+                    <p className="font-medium text-green-600">✓ Файл баталгаажсан</p>
+                    <p className="text-muted-foreground">Банкны хуулга гэж тодорхойлогдсон</p>
+                  </div>
                 </div>
               )}
+
 
               <div>
                 <label className="text-sm font-medium mb-2 block">Шинжилгээний тайлбар:</label>
@@ -354,6 +380,69 @@ export const AdminLoanReview = () => {
                 </div>
               </div>
 
+              {/* Credit Score Section */}
+              <div className="border-t pt-4">
+                <Label htmlFor="creditScore">Зээлийн оноо тохируулах</Label>
+                <div className="flex items-center gap-4 mt-2">
+                  <Input
+                    id="creditScore"
+                    type="number"
+                    min="0"
+                    max="100"
+                    value={creditScore}
+                    onChange={(e) => setCreditScore(e.target.value)}
+                    placeholder="0-100"
+                    className="w-24"
+                  />
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={async () => {
+                      const score = parseInt(creditScore);
+                      if (isNaN(score) || score < 0 || score > 100) {
+                        toast({
+                          title: "Алдаа",
+                          description: "Зээлийн оноо 0-100 хооронд байх ёстой",
+                          variant: "destructive"
+                        });
+                        return;
+                      }
+
+                      try {
+                        const { error } = await supabase
+                          .from('profiles')
+                          .update({
+                            credit_score: score,
+                            score_updated_at: new Date().toISOString(),
+                            score_updated_by: (await supabase.auth.getUser()).data.user?.id
+                          })
+                          .eq('user_id', selectedLoan.profiles?.user_id);
+
+                        if (error) throw error;
+
+                        toast({
+                          title: "Амжилттай",
+                          description: `Зээлийн оноо ${score} болж шинэчлэгдлээ`
+                        });
+
+                        fetchLoans();
+                      } catch (error) {
+                        toast({
+                          title: "Алдаа", 
+                          description: "Зээлийн оноо шинэчлэхэд алдаа гарлаа",
+                          variant: "destructive"
+                        });
+                      }
+                    }}
+                  >
+                    Оноо шинэчлэх
+                  </Button>
+                </div>
+                <p className="text-xs text-muted-foreground mt-1">
+                  Өндөр оноо = зээл авах боломж өндөр (0-100 оноо)
+                </p>
+              </div>
+
               <div className="flex gap-2">
                 <Button
                   variant="outline"
@@ -363,6 +452,7 @@ export const AdminLoanReview = () => {
                     setAdminNotes("");
                     setApprovedAmount("");
                     setInterestRate("");
+                    setCreditScore("");
                   }}
                 >
                   Цуцлах

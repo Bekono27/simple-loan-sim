@@ -41,7 +41,7 @@ export const LoanEligibility = () => {
     if (!bankStatement) {
       toast({
         title: "Алдаа", 
-        description: "Банкны хуулгаа оруулна уу",
+        description: "Санхүүгийн баримт бичгээ оруулна уу",
         variant: "destructive"
       });
       return;
@@ -66,14 +66,14 @@ export const LoanEligibility = () => {
           });
 
           if (error) {
-            throw new Error('Банкны хуулга шалгахад алдаа гарлаа');
+            throw new Error('Санхүүгийн баримт шалгахад алдаа гарлаа');
           }
 
           if (!verificationResult.isValid) {
             setIsCalculating(false);
             toast({
               title: "Файл буруу байна",
-              description: `${verificationResult.reason} Банкны хуулга оруулна уу.`,
+              description: `${verificationResult.reason} Санхүүгийн баримт бичиг оруулна уу.`,
               variant: "destructive"
             });
             return;
@@ -100,7 +100,7 @@ export const LoanEligibility = () => {
           setIsCalculating(false);
           toast({
             title: "Алдаа гарлаа",
-            description: "Банкны хуулга шалгахад алдаа гарлаа",
+            description: "Санхүүгийн баримт шалгахад алдаа гарлаа",
             variant: "destructive"
           });
         }
@@ -123,8 +123,8 @@ export const LoanEligibility = () => {
         <Card className="neu-card max-w-sm mx-4">
           <CardContent className="text-center py-8">
             <div className="w-16 h-16 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-            <h3 className="text-lg font-medium mb-2">Банкны хуулга шалгаж байна...</h3>
-            <p className="text-muted-foreground">Таны файл банкны хуулга мөн эсэхийг шалгаж байна</p>
+            <h3 className="text-lg font-medium mb-2">Санхүүгийн баримт шалгаж байна...</h3>
+            <p className="text-muted-foreground">Таны файлыг шинжилж байна</p>
           </CardContent>
         </Card>
       </div>
@@ -180,9 +180,9 @@ export const LoanEligibility = () => {
               </p>
             </div>
 
-            {/* Bank Statement Upload */}
+            {/* Financial Document Upload */}
             <div>
-              <Label>Банкны хуулга</Label>
+              <Label>Санхүүгийн баримт бичиг</Label>
               <div className="mt-2">
                 {bankStatement ? (
                   <div className="flex items-center gap-3 p-3 border rounded-lg bg-success/5 border-success">
@@ -207,21 +207,31 @@ export const LoanEligibility = () => {
                     <div className="text-center">
                       <p className="text-sm font-medium">Файл оруулах</p>
                       <p className="text-xs text-muted-foreground">
-                        PDF эсвэл зураг (5MB хүртэл)
+                        Бүх төрлийн баримт бичиг (10MB хүртэл)
                       </p>
                     </div>
                     <input
                       type="file"
-                      accept=".pdf,.jpg,.jpeg,.png"
+                      accept=".pdf,.jpg,.jpeg,.png,.doc,.docx,.xls,.xlsx,.txt"
                       onChange={handleFileChange}
                       className="hidden"
                     />
                   </label>
                 )}
               </div>
-              <p className="text-xs text-muted-foreground mt-2">
-                Сүүлийн 3 сарын банкны хуулга шаардлагатай
-              </p>
+              <div className="mt-2 space-y-1">
+                <p className="text-xs text-muted-foreground">
+                  Зөвшөөрөгдсөн баримт бичиг:
+                </p>
+                <ul className="text-xs text-muted-foreground grid grid-cols-2 gap-1">
+                  <li>• Банкны хуулга</li>
+                  <li>• Цалингийн хуулга</li>
+                  <li>• Хадгаламжийн данс</li>
+                  <li>• Хөрөнгийн гэрчилгээ</li>
+                  <li>• Орлогын тодорхойлолт</li>
+                  <li>• Бизнесийн орлого</li>
+                </ul>
+              </div>
             </div>
 
             {/* Calculate Button */}
