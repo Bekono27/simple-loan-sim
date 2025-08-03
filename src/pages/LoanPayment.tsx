@@ -18,8 +18,8 @@ export const LoanPayment = () => {
   const analysisfee = 3000;
 
   const bankDetails = {
-    accountNumber: "5001234567",
-    accountName: "ЗЭЭЛИЙН ШИНЖИЛГЭЭ ХХК",
+    accountNumber: "MN24001500 2015180476",
+    accountName: "Byektas Syerikbyek",
     bank: "Хаан банк",
     reference: `LOAN${Date.now().toString().slice(-6)}`
   };
@@ -280,7 +280,7 @@ export const LoanPayment = () => {
                     <p className="text-sm">{bankDetails.bank}</p>
                   </div>
                   <div className="p-3 bg-muted rounded-lg">
-                    <p className="text-sm font-medium">Дансны дугаар</p>
+                    <p className="text-sm font-medium">IBAN дугаар</p>
                     <div className="flex items-center gap-2">
                       <code className="text-sm">{bankDetails.accountNumber}</code>
                       <Button
