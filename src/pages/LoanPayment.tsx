@@ -17,11 +17,18 @@ export const LoanPayment = () => {
 
   const analysisfee = 3000;
 
+  // Generate a truly unique reference number
+  const generateReferenceNumber = () => {
+    const timestamp = Date.now().toString();
+    const randomSuffix = Math.random().toString(36).substring(2, 6).toUpperCase();
+    return `FL${timestamp.slice(-8)}${randomSuffix}`;
+  };
+
   const bankDetails = {
     accountNumber: "MN24001500 2015180476",
     accountName: "Byektas Syerikbyek",
     bank: "Хаан банк",
-    reference: `LOAN${Date.now().toString().slice(-6)}`
+    reference: generateReferenceNumber()
   };
 
   const copyToClipboard = (text: string) => {
