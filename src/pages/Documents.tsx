@@ -196,37 +196,35 @@ export const Documents = () => {
         </Card>
 
         {/* Document Types Info */}
-        <Card className="p-6">
-          <h3 className="font-semibold mb-4">Шаардлагатай баримт бичиг</h3>
-          <div className="space-y-3">
+        <Card className="p-4">
+          <h3 className="font-semibold mb-3">Шаардлагатай баримт бичиг</h3>
+          <div className="space-y-2">
             <div className="flex items-center gap-3">
-              <CheckCircle className="w-5 h-5 text-green-600" />
+              <CheckCircle className="w-4 h-4 text-green-600" />
               <div>
-                <p className="font-medium">Банкны баримт</p>
-                <p className="text-sm text-muted-foreground">Сүүлийн 3 сарын банкны баланс</p>
+                <p className="font-medium text-sm">Банкны баримт</p>
+                <p className="text-xs text-muted-foreground">Сүүлийн 3 сарын банкны баланс</p>
               </div>
             </div>
+          </div>
+        </Card>
+
+        {/* Terms and Conditions */}
+        <Card className="p-4">
+          <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <CheckCircle className="w-5 h-5 text-green-600" />
+              <div className="w-8 h-8 bg-primary/10 rounded-lg flex items-center justify-center">
+                <FileText className="w-4 h-4 text-primary" />
+              </div>
               <div>
-                <p className="font-medium">Иргэний үнэмлэх</p>
-                <p className="text-sm text-muted-foreground">Хүчинтэй иргэний үнэмлэхийн хуулбар</p>
+                <p className="font-medium text-sm">Үйлчилгээний нөхцөл</p>
+                <p className="text-xs text-muted-foreground">Гэрээ болон нууцлалын бодлого</p>
               </div>
             </div>
-            <div className="flex items-center gap-3">
-              <CheckCircle className="w-5 h-5 text-green-600" />
-              <div>
-                <p className="font-medium">Орлогын справка</p>
-                <p className="text-sm text-muted-foreground">Ажил олгогчоос авсан орлогын гэрчилгээ</p>
-              </div>
-            </div>
-            <div className="flex items-center gap-3">
-              <CheckCircle className="w-5 h-5 text-green-600" />
-              <div>
-                <p className="font-medium">Үйлчилгээний гэрээ</p>
-                <p className="text-sm text-muted-foreground">Бүртгэлийн үед зөвшөөрсөн үйлчилгээний нөхцөл</p>
-              </div>
-            </div>
+            <Button variant="outline" size="sm" onClick={() => navigate("/profile")}>
+              <Eye className="w-4 h-4 mr-1" />
+              Унших
+            </Button>
           </div>
         </Card>
       </div>
