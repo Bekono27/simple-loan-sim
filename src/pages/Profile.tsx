@@ -207,7 +207,7 @@ export const Profile = () => {
         {/* Stats Cards */}
         <div className="grid grid-cols-2 gap-4">
           <Card className="p-4 text-center">
-            <div className="text-2xl font-bold text-primary">750</div>
+            <div className="text-2xl font-bold text-primary">0</div>
             <div className="text-sm text-muted-foreground">Зээлийн үнэлгээ</div>
           </Card>
           <Card className="p-4 text-center">

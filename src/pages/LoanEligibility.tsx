@@ -5,7 +5,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "@/hooks/use-toast";
-import { ArrowLeft, Upload, FileText, AlertTriangle } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { ArrowLeft, Upload, FileText, AlertTriangle, Wallet, CreditCard, ShoppingBag, User } from "lucide-react";
 
 export const LoanEligibility = () => {
   const navigate = useNavigate();
@@ -27,7 +28,7 @@ export const LoanEligibility = () => {
     setLoanAmount(value);
   };
 
-  const handleCalculateEligibility = () => {
+  const handleCalculateEligibility = async () => {
     if (!loanAmount) {
       toast({
         title: "Алдаа",
@@ -48,21 +49,72 @@ export const LoanEligibility = () => {
 
     setIsCalculating(true);
 
-    // Store loan application data
-    const applicationData = {
-      loanAmount: Number(loanAmount),
-      bankStatementFile: bankStatement.name,
-      applicationDate: new Date().toISOString(),
-      status: "pending_payment"
-    };
+    try {
+      // Convert file to base64 for verification
+      const fileReader = new FileReader();
+      fileReader.onload = async (e) => {
+        const fileContent = e.target?.result as string;
+        
+        try {
+          // Verify if it's actually a bank statement
+          const { data: verificationResult, error } = await supabase.functions.invoke('verify-bank-statement', {
+            body: {
+              fileContent: fileContent.substring(0, 10000), // First 10k chars for analysis
+              fileName: bankStatement.name,
+              fileType: bankStatement.type
+            }
+          });
 
-    localStorage.setItem("loanApplication", JSON.stringify(applicationData));
+          if (error) {
+            throw new Error('Банкны хуулга шалгахад алдаа гарлаа');
+          }
 
-    // Simulate processing time
-    setTimeout(() => {
+          if (!verificationResult.isValid) {
+            setIsCalculating(false);
+            toast({
+              title: "Файл буруу байна",
+              description: `${verificationResult.reason} Банкны хуулга оруулна уу.`,
+              variant: "destructive"
+            });
+            return;
+          }
+
+          // Store loan application data
+          const applicationData = {
+            loanAmount: Number(loanAmount),
+            bankStatementFile: bankStatement.name,
+            applicationDate: new Date().toISOString(),
+            status: "pending_payment",
+            verificationResult: verificationResult
+          };
+
+          localStorage.setItem("loanApplication", JSON.stringify(applicationData));
+
+          // Simulate processing time
+          setTimeout(() => {
+            setIsCalculating(false);
+            navigate("/loan-payment");
+          }, 2000);
+
+        } catch (error) {
+          setIsCalculating(false);
+          toast({
+            title: "Алдаа гарлаа",
+            description: "Банкны хуулга шалгахад алдаа гарлаа",
+            variant: "destructive"
+          });
+        }
+      };
+
+      fileReader.readAsText(bankStatement);
+    } catch (error) {
       setIsCalculating(false);
-      navigate("/loan-payment");
-    }, 2000);
+      toast({
+        title: "Алдаа гарлаа",
+        description: "Файл уншихад алдаа гарлаа",
+        variant: "destructive"
+      });
+    }
   };
 
   if (isCalculating) {
@@ -71,8 +123,8 @@ export const LoanEligibility = () => {
         <Card className="neu-card max-w-sm mx-4">
           <CardContent className="text-center py-8">
             <div className="w-16 h-16 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-            <h3 className="text-lg font-medium mb-2">Шинжилж байна...</h3>
-            <p className="text-muted-foreground">Таны банкны хуулгыг шинжилж байна</p>
+            <h3 className="text-lg font-medium mb-2">Банкны хуулга шалгаж байна...</h3>
+            <p className="text-muted-foreground">Таны файл банкны хуулга мөн эсэхийг шалгаж байна</p>
           </CardContent>
         </Card>
       </div>
@@ -124,7 +176,7 @@ export const LoanEligibility = () => {
                 className="text-right text-lg"
               />
               <p className="text-sm text-muted-foreground mt-1">
-                Хамгийн бага: 500,000₮
+                Хамгийн бага: 300,000₮ • Хүү: 2.1% (долоо хоног тутам)
               </p>
             </div>
 
@@ -201,6 +253,42 @@ export const LoanEligibility = () => {
             </div>
           </CardContent>
         </Card>
+
+        {/* Bottom Navigation Icons */}
+        <div className="fixed bottom-0 left-0 right-0 bg-card border-t border-border">
+          <div className="max-w-md mx-auto px-4 py-2">
+            <div className="flex justify-around items-center">
+              <button
+                onClick={() => navigate("/dashboard")}
+                className="flex flex-col items-center py-2 px-3 rounded-lg transition-all duration-200 text-muted-foreground hover:text-foreground"
+              >
+                <Wallet className="w-5 h-5 mb-1" />
+                <span className="text-xs font-medium">Хэтэвч</span>
+              </button>
+              <button
+                onClick={() => navigate("/loan-eligibility")}
+                className="flex flex-col items-center py-2 px-3 rounded-lg transition-all duration-200 text-primary bg-primary/10"
+              >
+                <CreditCard className="w-5 h-5 mb-1" />
+                <span className="text-xs font-medium">Зээл</span>
+              </button>
+              <button
+                onClick={() => navigate("/simple-buy")}
+                className="flex flex-col items-center py-2 px-3 rounded-lg transition-all duration-200 text-muted-foreground hover:text-foreground"
+              >
+                <ShoppingBag className="w-5 h-5 mb-1" />
+                <span className="text-xs font-medium">Үйлчилгээ</span>
+              </button>
+              <button
+                onClick={() => navigate("/profile")}
+                className="flex flex-col items-center py-2 px-3 rounded-lg transition-all duration-200 text-muted-foreground hover:text-foreground"
+              >
+                <User className="w-5 h-5 mb-1" />
+                <span className="text-xs font-medium">Профайл</span>
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );
