@@ -77,33 +77,27 @@ export const Auth = () => {
           password: loginData.password,
         };
       } else if (authMethod === "username") {
-        // For username login, we'll use a simpler approach
-        // Try to find the user's email through the profiles table
+        // For username login, get email from profiles table
         const { data: profiles, error: profileError } = await supabase
           .from('profiles')
-          .select('*')
+          .select('email')
           .eq('username', loginData.username)
           .single();
 
-        if (profileError || !profiles) {
+        if (profileError || !profiles || !profiles.email) {
           toast({
             title: "Алдаа гарлаа",
-            description: "Хэрэглэгчийн нэр олдсонгүй",
+            description: "Хэрэглэгчийн нэр олдсонгүй эсвэл и-мэйл хаяг бүртгэгдээгүй байна",
             variant: "destructive"
           });
           setLoading(false);
           return;
         }
 
-        // Since we can't get the email from profiles, we'll need to store it there
-        // For now, let's show an error message asking users to use email/phone
-        toast({
-          title: "Анхаар",
-          description: "Хэрэглэгчийн нэрээр нэвтрэх одоохондоо боломжгүй. И-мэйл эсвэл утасны дугаараа ашиглана уу.",
-          variant: "destructive"
-        });
-        setLoading(false);
-        return;
+        authData = {
+          email: profiles.email,
+          password: loginData.password,
+        };
       } else {
         authData = {
           email: loginData.email,

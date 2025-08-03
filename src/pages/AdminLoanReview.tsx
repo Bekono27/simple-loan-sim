@@ -71,7 +71,7 @@ export const AdminLoanReview = () => {
       console.error('Error fetching loans:', error);
       toast({
         title: "Алдаа",
-        description: "Зээлийн хүсэлт татахад алдаа гарлаа",
+        description: "Факт зээлийн хүсэлт татахад алдаа гарлаа",
         variant: "destructive"
       });
     } finally {
@@ -96,7 +96,7 @@ export const AdminLoanReview = () => {
 
       toast({
         title: "Амжилттай",
-        description: `Зээлийн хүсэлт ${status === 'approved' ? 'зөвшөөрөгдлөө' : 'татгалзлаа'}`
+        description: `Факт зээлийн хүсэлт ${status === 'approved' ? 'зөвшөөрөгдлөө' : 'татгалзлаа'}`
       });
 
       fetchLoans();
@@ -169,7 +169,7 @@ export const AdminLoanReview = () => {
         >
           <ArrowLeft className="w-5 h-5" />
         </Button>
-        <h1 className="text-3xl font-bold">Зээлийн хүсэлт шалгах</h1>
+        <h1 className="text-3xl font-bold">Факт зээлийн хүсэлт шалгах</h1>
         <Button onClick={fetchLoans} variant="outline">
           Шинэчлэх
         </Button>
@@ -251,7 +251,7 @@ export const AdminLoanReview = () => {
 
       {loans.length === 0 && (
         <div className="text-center py-12">
-          <p className="text-muted-foreground">Зээлийн хүсэлт олдсонгүй</p>
+          <p className="text-muted-foreground">Факт зээлийн хүсэлт олдсонгүй</p>
         </div>
       )}
 
@@ -260,7 +260,7 @@ export const AdminLoanReview = () => {
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
           <Card className="w-full max-w-2xl max-h-[90vh] overflow-y-auto">
             <CardHeader>
-              <CardTitle>Зээлийн хүсэлт шалгах</CardTitle>
+              <CardTitle>Факт зээлийн хүсэлт шалгах</CardTitle>
               <p className="text-sm text-muted-foreground">
                 {selectedLoan.profiles?.full_name} - {selectedLoan.amount.toLocaleString()}₮
               </p>
@@ -311,7 +311,7 @@ export const AdminLoanReview = () => {
                 <Textarea
                   value={adminNotes}
                   onChange={(e) => setAdminNotes(e.target.value)}
-                  placeholder="Зээлийн хүсэлтийн талаарх тайлбар бичих..."
+                  placeholder="Факт зээлийн хүсэлтийн талаарх тайлбар бичих..."
                   rows={4}
                 />
               </div>

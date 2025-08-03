@@ -93,7 +93,7 @@ export const Dashboard = () => {
                 <h2 className="text-2xl font-bold">
                   Сайн байна уу, {profile?.full_name || profile?.username || 'Хэрэглэгч'}!
                 </h2>
-                <p className="text-muted-foreground">Таны зээлийн мэдээлэл</p>
+                <p className="text-muted-foreground">Таны факт зээлийн мэдээлэл</p>
               </div>
               <Button
                 variant="ghost"
