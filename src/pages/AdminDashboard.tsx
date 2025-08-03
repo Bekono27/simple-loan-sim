@@ -224,13 +224,16 @@ export const AdminDashboard = () => {
               <p className="text-muted-foreground mb-4">
                 Хэрэглэгчдийн төлбөрийг шалгаж баталгаажуулах
               </p>
-              <Button onClick={() => navigate("/admin-payments")} className="w-full">
+              <Button onClick={() => navigate("/admin-payments")} className="w-full mb-2">
                 Төлбөр шалгах
                 {stats.pendingPayments > 0 && (
                   <Badge variant="destructive" className="ml-2">
                     {stats.pendingPayments}
                   </Badge>
                 )}
+              </Button>
+              <Button onClick={() => navigate("/admin-loan-review")} variant="outline" className="w-full">
+                Зээлийн хүсэлт шалгах
               </Button>
             </CardContent>
           </Card>

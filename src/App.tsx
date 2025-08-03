@@ -23,6 +23,7 @@ import { P2PLoan } from "./pages/P2PLoan";
 import { AdminLogin } from "./pages/AdminLogin";
 import { AdminDashboard } from "./pages/AdminDashboard";
 import { AdminPayments } from "./pages/AdminPayments";
+import { AdminLoanReview } from "./pages/AdminLoanReview";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -56,6 +57,7 @@ const App = () => (
             <Route path="/admin-login" element={<AdminLogin />} />
             <Route path="/admin-dashboard" element={<AdminDashboard />} />
             <Route path="/admin-payments" element={<AdminPayments />} />
+            <Route path="/admin-loan-review" element={<AdminLoanReview />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
