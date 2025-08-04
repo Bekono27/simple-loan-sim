@@ -194,7 +194,7 @@ export const LoanPayment = () => {
             <CardTitle>Төлбөрийн арга сонгох</CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
-            {/* QR Code / QPay Option */}
+            {/* QR Code Option */}
             <div 
               onClick={() => setPaymentMethod("qpay")}
               className={`p-4 border rounded-lg cursor-pointer transition-colors ${
@@ -208,10 +208,10 @@ export const LoanPayment = () => {
                   <QrCode className="w-5 h-5 text-primary" />
                 </div>
                 <div className="flex-1">
-                  <h3 className="font-medium">QR код / QPay</h3>
-                  <p className="text-sm text-muted-foreground">Тун удахгүй</p>
+                  <h3 className="font-medium">QR код</h3>
+                  <p className="text-sm text-muted-foreground">QR кодоор төлөх</p>
                 </div>
-                <div className="text-xs bg-muted px-2 py-1 rounded">Удахгүй</div>
+                <div className="text-xs bg-green-100 text-green-800 px-2 py-1 rounded">Боломжтой</div>
                 {paymentMethod === "qpay" && (
                   <CheckCircle className="w-5 h-5 text-primary" />
                 )}
