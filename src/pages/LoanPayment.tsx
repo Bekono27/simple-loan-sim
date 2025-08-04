@@ -209,9 +209,9 @@ export const LoanPayment = () => {
                 </div>
                 <div className="flex-1">
                   <h3 className="font-medium">QR код / QPay</h3>
-                  <p className="text-sm text-muted-foreground">Тун удахгүй</p>
+                  <p className="text-sm text-muted-foreground">Шууд төлбөр</p>
                 </div>
-                <div className="text-xs bg-muted px-2 py-1 rounded">Удахгүй</div>
+                <div className="text-xs bg-green-100 text-green-800 px-2 py-1 rounded">Боломжтой</div>
                 {paymentMethod === "qpay" && (
                   <CheckCircle className="w-5 h-5 text-primary" />
                 )}
@@ -262,11 +262,15 @@ export const LoanPayment = () => {
             <CardContent>
               {paymentMethod === "qpay" ? (
                 <div className="text-center">
-                  <div className="w-48 h-48 bg-gradient-to-br from-primary/20 to-primary/5 rounded-lg flex items-center justify-center mx-auto mb-4">
-                    <QrCode className="w-24 h-24 text-primary" />
+                  <div className="w-48 h-48 bg-white rounded-lg flex items-center justify-center mx-auto mb-4 p-4">
+                    <img 
+                      src="/lovable-uploads/1008a972-852b-4001-9852-1a4dc9e48876.png" 
+                      alt="QR Code for Payment" 
+                      className="w-full h-full object-contain"
+                    />
                   </div>
                   <p className="text-sm text-muted-foreground mb-4">
-                    QR код тун удахгүй нэмэгдэнэ
+                    QR код-ыг уншуулж төлбөр төлнө үү
                   </p>
                   <div className="p-3 bg-muted rounded-lg">
                     <p className="text-sm font-medium">Гүйлгээний утга</p>
