@@ -30,14 +30,14 @@ export const LoanResult = () => {
             <div className="mx-auto w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mb-4">
               <Clock className="w-8 h-8 text-primary animate-pulse" />
             </div>
-            <CardTitle className="text-2xl text-primary">Хүлээж байна</CardTitle>
+            <CardTitle className="text-2xl text-primary">Түр Хүлээнэ үү</CardTitle>
           </CardHeader>
           <CardContent className="text-center space-y-4">
             <p className="text-lg font-medium">
               Таны зээлийн хүсэлтийг шинжилж байна
             </p>
             <p className="text-muted-foreground">
-              Админ танай төлбөрийг шалгаад зөвшөөрөх эсэхийг шийдэх болно.
+              Ажилтан таны төлбөрийг шалгаад хариу өгөх болно.
             </p>
           </CardContent>
         </Card>
@@ -45,7 +45,7 @@ export const LoanResult = () => {
         {/* Timeline Card */}
         <Card className="mb-6">
           <CardHeader>
-            <CardTitle className="text-lg">Үйл явцын дарааллага</CardTitle>
+            <CardTitle className="text-lg">Үйл явцын дараалал</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="flex items-center gap-3">
@@ -54,7 +54,7 @@ export const LoanResult = () => {
               </div>
               <div>
                 <p className="font-medium text-sm">Хүсэлт илгээгдсэн</p>
-                <p className="text-xs text-muted-foreground">Таны мэдээлэл хүлээн авлаа</p>
+                <p className="text-xs text-muted-foreground">Таны мэдээлэлийг хүлээн авлаа</p>
               </div>
             </div>
             
@@ -73,7 +73,7 @@ export const LoanResult = () => {
                 <Clock className="w-4 h-4 text-muted-foreground" />
               </div>
               <div>
-                <p className="font-medium text-sm text-muted-foreground">Админ шалгах</p>
+                <p className="font-medium text-sm text-muted-foreground">Ажилтан шалгах</p>
                 <p className="text-xs text-muted-foreground">Зөвшөөрөх эсэхийг шийдэх</p>
               </div>
             </div>
@@ -99,6 +99,7 @@ export const LoanResult = () => {
               <p>• Админ таны хүсэлтийг дэлгэрэнгүй шалгана</p>
               <p>• Эцсийн хариу апп дээр мэдэгдэл болон ирнэ</p>
               <p>• Утсаа үргэлж асаалттай байлгана уу</p>
+              <p>• Энэ төлбөр нь зөвхөн таны зээлийн мэдээлэлийг шалгахад ашиглагдах болно.</p>
             </div>
           </CardContent>
         </Card>
