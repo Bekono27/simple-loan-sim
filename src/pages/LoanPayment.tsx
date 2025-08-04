@@ -122,7 +122,7 @@ export const LoanPayment = () => {
 
       toast({
         title: "Амжилттай",
-        description: "Төлбөрийн мэдээлэл админд илгээгдлээ. Баталгаажуулалтыг хүлээнэ үү."
+        description: "Төлбөрийн мэдээлэл ажилтанд илгээгдлээ. Баталгаажуулалтыг хүлээнэ үү."
       });
 
       // Simulate processing time
@@ -320,7 +320,7 @@ export const LoanPayment = () => {
                   </div>
                   
                   <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mt-4">
-                    <h4 className="text-sm font-medium text-blue-900 mb-2">Админы баталгаажуулалт</h4>
+                    <h4 className="text-sm font-medium text-blue-900 mb-2">Ажилтний баталгаажуулалт</h4>
                     <p className="text-xs text-blue-700">
                       Төлбөр хийсний дараа админ таны төлбөрийг шалгаж баталгаажуулна. 
                       Энэ нь 24 цагийн дотор хийгдэнэ.
@@ -344,7 +344,7 @@ export const LoanPayment = () => {
               />
               <Label htmlFor="paymentAgreement" className="text-sm leading-5">
                 Би {analysisfee.toLocaleString()}₮ төлбөр төлснийг ойлгож байна. 
-                Энэ төлбөр нь зээл олгохыг баталгаажуулдаггүй бөгөөд буцаагддаггүй.Мөн би үйлчилгээний нөхцөлийг зөвшөөрч байна. 
+                Энэ төлбөр нь зээл олгохыг баталгаажуулдаггүй бөгөөд буцаагддаггүй.
               </Label>
             </div>
 
