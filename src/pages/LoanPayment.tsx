@@ -27,8 +27,8 @@ export const LoanPayment = () => {
   };
 
   const bankDetails = {
-    accountNumber: "MN24001500 2015180476",
-    accountName: "Byektas Syerikbyek",
+    accountNumber: "MN11000500 5169954211",
+    accountName: "Bektas",
     bank: "Хаан банк",
     reference: generateReferenceNumber()
   };
@@ -194,7 +194,7 @@ export const LoanPayment = () => {
             <CardTitle>Төлбөрийн арга сонгох</CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
-            {/* QR Code Option */}
+            {/* QR Code / QPay Option */}
             <div 
               onClick={() => setPaymentMethod("qpay")}
               className={`p-4 border rounded-lg cursor-pointer transition-colors ${
@@ -208,10 +208,10 @@ export const LoanPayment = () => {
                   <QrCode className="w-5 h-5 text-primary" />
                 </div>
                 <div className="flex-1">
-                  <h3 className="font-medium">QR код</h3>
-                  <p className="text-sm text-muted-foreground">QR кодоор төлөх</p>
+                  <h3 className="font-medium">QR код / QPay</h3>
+                  <p className="text-sm text-muted-foreground">Тун удахгүй</p>
                 </div>
-                <div className="text-xs bg-green-100 text-green-800 px-2 py-1 rounded">Боломжтой</div>
+                <div className="text-xs bg-muted px-2 py-1 rounded">Удахгүй</div>
                 {paymentMethod === "qpay" && (
                   <CheckCircle className="w-5 h-5 text-primary" />
                 )}
@@ -262,15 +262,11 @@ export const LoanPayment = () => {
             <CardContent>
               {paymentMethod === "qpay" ? (
                 <div className="text-center">
-                  <div className="w-48 h-48 bg-white rounded-lg border flex items-center justify-center mx-auto mb-4">
-                    <img 
-                      src="/lovable-uploads/1008a972-852b-4001-9852-1a4dc9e48876.png" 
-                      alt="QR код" 
-                      className="w-full h-full object-contain"
-                    />
+                  <div className="w-48 h-48 bg-gradient-to-br from-primary/20 to-primary/5 rounded-lg flex items-center justify-center mx-auto mb-4">
+                    <QrCode className="w-24 h-24 text-primary" />
                   </div>
                   <p className="text-sm text-muted-foreground mb-4">
-                    QR кодыг уншуулан төлбөр хийнэ үү
+                    QR код тун удахгүй нэмэгдэнэ
                   </p>
                   <div className="p-3 bg-muted rounded-lg">
                     <p className="text-sm font-medium">Гүйлгээний утга</p>
@@ -326,8 +322,8 @@ export const LoanPayment = () => {
                   <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mt-4">
                     <h4 className="text-sm font-medium text-blue-900 mb-2">Админы баталгаажуулалт</h4>
                     <p className="text-xs text-blue-700">
-                      Төлбөр хийсний дараа ажилтан таны төлбөрийг шалгаж баталгаажуулна. 
-                      Энэ нь 30 минутын дотор шалгагдна.
+                      Төлбөр хийсний дараа админ таны төлбөрийг шалгаж баталгаажуулна. 
+                      Энэ нь 24 цагийн дотор хийгдэнэ.
                     </p>
                   </div>
                 </div>
@@ -348,7 +344,7 @@ export const LoanPayment = () => {
               />
               <Label htmlFor="paymentAgreement" className="text-sm leading-5">
                 Би {analysisfee.toLocaleString()}₮ төлбөр төлснийг ойлгож байна. 
-                Энэ төлбөр нь зээл олгохыг баталгаажуулдаггүй бөгөөд буцаагддаггүй. Мөн би төлбөр төлсөнөөр Fact loan-ы үйлчилгээний нөхцөлийг зөвшөөрч байна.
+                Энэ төлбөр нь зээл олгохыг баталгаажуулдаггүй бөгөөд буцаагддаггүй.
               </Label>
             </div>
 
