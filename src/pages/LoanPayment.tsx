@@ -262,11 +262,15 @@ export const LoanPayment = () => {
             <CardContent>
               {paymentMethod === "qpay" ? (
                 <div className="text-center">
-                  <div className="w-48 h-48 bg-gradient-to-br from-primary/20 to-primary/5 rounded-lg flex items-center justify-center mx-auto mb-4">
-                    <QrCode className="w-24 h-24 text-primary" />
+                  <div className="w-48 h-48 bg-white rounded-lg border flex items-center justify-center mx-auto mb-4">
+                    <img 
+                      src="/lovable-uploads/1008a972-852b-4001-9852-1a4dc9e48876.png" 
+                      alt="QR код" 
+                      className="w-full h-full object-contain"
+                    />
                   </div>
                   <p className="text-sm text-muted-foreground mb-4">
-                    QR код тун удахгүй нэмэгдэнэ
+                    QR кодыг уншуулан төлбөр хийнэ үү
                   </p>
                   <div className="p-3 bg-muted rounded-lg">
                     <p className="text-sm font-medium">Гүйлгээний утга</p>

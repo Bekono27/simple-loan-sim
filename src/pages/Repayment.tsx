@@ -122,14 +122,14 @@ export const Repayment = () => {
               <p className="text-muted-foreground">Банкны апп-аараа QR кодыг уншуулна уу</p>
             </div>
 
-            {/* Mock QR Code */}
-            <div className="bg-white p-6 rounded-lg border-2 border-dashed border-muted mb-6">
-              <div className="w-full aspect-square bg-gradient-to-br from-primary to-primary/70 rounded-lg flex items-center justify-center">
-                <div className="text-white text-center">
-                  <QrCode className="w-20 h-20 mx-auto mb-2" />
-                  <p className="text-sm font-semibold">QPay</p>
-                  <p className="text-xs">₮{parseInt(paymentAmount).toLocaleString()}</p>
-                </div>
+            {/* QR Code */}
+            <div className="bg-white p-6 rounded-lg border mb-6">
+              <div className="w-full aspect-square flex items-center justify-center">
+                <img 
+                  src="/lovable-uploads/1008a972-852b-4001-9852-1a4dc9e48876.png" 
+                  alt="QPay QR код" 
+                  className="w-full h-full object-contain max-w-64 max-h-64"
+                />
               </div>
             </div>
 
