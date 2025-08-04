@@ -322,8 +322,8 @@ export const LoanPayment = () => {
                   <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mt-4">
                     <h4 className="text-sm font-medium text-blue-900 mb-2">Админы баталгаажуулалт</h4>
                     <p className="text-xs text-blue-700">
-                      Төлбөр хийсний дараа админ таны төлбөрийг шалгаж баталгаажуулна. 
-                      Энэ нь 24 цагийн дотор хийгдэнэ.
+                      Төлбөр хийсний дараа ажилтан таны төлбөрийг шалгаж баталгаажуулна. 
+                      Энэ нь 30 минутын дотор шалгагдна.
                     </p>
                   </div>
                 </div>
@@ -343,8 +343,8 @@ export const LoanPayment = () => {
                 onCheckedChange={(checked) => setAgreedToPay(!!checked)}
               />
               <Label htmlFor="paymentAgreement" className="text-sm leading-5">
-                Би {analysisfee.toLocaleString()}₮ төлбөр би төлөхийг зөвшөөрч байна. 
-                Энэ төлбөр нь зээл олгохыг баталгаажуулдаггүй бөгөөд буцаагддаггүй.
+                Би {analysisfee.toLocaleString()}₮ төлбөр төлснийг ойлгож байна. 
+                Энэ төлбөр нь зээл олгохыг баталгаажуулдаггүй бөгөөд буцаагддаггүй. Мөн би төлбөр төлсөнөөр Fact loan-ы үйлчилгээний нөхцөлийг зөвшөөрч байна.
               </Label>
             </div>
 
