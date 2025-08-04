@@ -122,7 +122,7 @@ export const LoanPayment = () => {
 
       toast({
         title: "Амжилттай",
-        description: "Төлбөрийн мэдээлэл админд илгээгдлээ. Баталгаажуулалтыг хүлээнэ үү."
+        description: "Төлбөрийн мэдээлэл ажилтан руу илгээгдлээ. Баталгаажуулалтыг хүлээнэ үү."
       });
 
       // Simulate processing time
@@ -326,8 +326,8 @@ export const LoanPayment = () => {
                   <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mt-4">
                     <h4 className="text-sm font-medium text-blue-900 mb-2">Админы баталгаажуулалт</h4>
                     <p className="text-xs text-blue-700">
-                      Төлбөр хийсний дараа админ таны төлбөрийг шалгаж баталгаажуулна. 
-                      Энэ нь 24 цагийн дотор хийгдэнэ.
+                      Төлбөр хийсний дараа ажилтан таны төлбөрийг шалгаж баталгаажуулна. 
+                      Энэ нь 30 минутын дотор хийгдэнэ.
                     </p>
                   </div>
                 </div>
@@ -347,8 +347,8 @@ export const LoanPayment = () => {
                 onCheckedChange={(checked) => setAgreedToPay(!!checked)}
               />
               <Label htmlFor="paymentAgreement" className="text-sm leading-5">
-                Би {analysisfee.toLocaleString()}₮ төлбөр төлөхийг зөвшөөрч байна. 
-                Энэхүү төлбөр нь зээл олгох баталгаа биш бөгөөд буцаагддаггүй болохыг ойлгож байна.
+                Би {analysisfee.toLocaleString()}₮  төлбөр төлөхийн зөвшөөрч байна. 
+                Энэ төлбөр нь зээл олгохыг баталгаажуулдаггүй бөгөөд буцаагддаггүй.Мөн төлбөр төлсөнөөр Fact loan ы үйлчилгээний нөхцөлийг зөвшөөрч байна.
               </Label>
             </div>
 
