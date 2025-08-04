@@ -90,8 +90,8 @@ export const Support = () => {
                 <Phone className="w-5 h-5 text-primary" />
               </div>
               <div>
-                <div className="font-medium">Утасны тусламж</div>
-                <div className="text-sm text-muted-foreground">1800-SIMPLE (24/7)</div>
+                <div className="font-medium">Холбоо барих</div>
+                <div className="text-sm text-muted-foreground"> 72100627 (24/7)</div>
               </div>
             </div>
           </Card>
@@ -184,19 +184,19 @@ export const Support = () => {
           <div className="space-y-2 text-sm">
             <div className="flex justify-between items-center py-2 border-b border-border">
               <span>Зээлийн хүсэлтийн төлөв</span>
-              <span className="text-muted-foreground">Хяналтын самбарт шалгах</span>
+              <span className="text-muted-foreground">шалгах</span>
             </div>
             <div className="flex justify-between items-center py-2 border-b border-border">
-              <span>Төлбөр боловсруулагдаагүй</span>
+              <span>Төлбөр баталгаажуулах</span>
               <span className="text-muted-foreground">24-48 цаг</span>
             </div>
             <div className="flex justify-between items-center py-2 border-b border-border">
               <span>Хувийн мэдээлэл шинэчлэх</span>
-              <span className="text-muted-foreground">Тусламжтай холбогдох</span>
+              <span className="text-muted-foreground">72100627</span>
             </div>
             <div className="flex justify-between items-center py-2">
               <span>Техникийн асуудал</span>
-              <span className="text-muted-foreground">Маягтаар мэдэгдэх</span>
+              <span className="text-muted-foreground">adfactloan@gmail.com</span>
             </div>
           </div>
         </Card>
