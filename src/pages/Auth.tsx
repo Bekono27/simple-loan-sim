@@ -8,7 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { User, Mail, Lock, Phone, Calendar, IdCard, Loader2, Eye, EyeOff } from "lucide-react";
+import { User, Mail, Lock, Phone, Calendar, IdCard, Loader2, Eye, EyeOff, ArrowLeft } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { validatePassword, checkCommonPasswords, cleanupAuthState } from "@/lib/security";
@@ -24,6 +24,8 @@ export const Auth = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [passwordStrength, setPasswordStrength] = useState<string>("");
   const [authMethod, setAuthMethod] = useState<"email" | "phone" | "username">("email");
+  const [showForgotPassword, setShowForgotPassword] = useState(false);
+  const [resetEmail, setResetEmail] = useState("");
 
   const [loginData, setLoginData] = useState({
     email: "",
@@ -90,7 +92,7 @@ export const Auth = () => {
           .from('profiles')
           .select('email')
           .eq('username', loginData.username)
-          .single();
+          .maybeSingle();
 
         if (profileError || !profiles || !profiles.email) {
           toast({
@@ -258,6 +260,50 @@ export const Auth = () => {
     }
   };
 
+  const handleForgotPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!resetEmail) {
+      toast({
+        title: "Алдаа гарлаа",
+        description: "И-мэйл хаяг оруулна уу",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(resetEmail, {
+        redirectTo: `${window.location.origin}/auth`,
+      });
+
+      if (error) {
+        toast({
+          title: "Алдаа гарлаа",
+          description: "Нууц үг сэргээхэд алдаа гарлаа",
+          variant: "destructive"
+        });
+      } else {
+        toast({
+          title: "И-мэйл илгээгдлээ",
+          description: "Нууц үг сэргээх заавар таны и-мэйлд илгээгдлээ"
+        });
+        setShowForgotPassword(false);
+        setResetEmail("");
+      }
+    } catch (error) {
+      toast({
+        title: "Алдаа гарлаа",
+        description: "Нууц үг сэргээхэд алдаа гарлаа",
+        variant: "destructive"
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary/10 to-secondary/10 flex items-center justify-center p-4">
       <div className="w-full max-w-md space-y-6">
@@ -374,6 +420,17 @@ export const Auth = () => {
                     {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                     Нэвтрэх
                   </Button>
+
+                  <div className="text-center">
+                    <Button
+                      type="button"
+                      variant="link"
+                      className="text-sm text-muted-foreground"
+                      onClick={() => setShowForgotPassword(true)}
+                    >
+                      Нууц үгээ мартсан уу?
+                    </Button>
+                  </div>
                 </form>
               </CardContent>
             </Card>
@@ -641,6 +698,49 @@ export const Auth = () => {
             <Button onClick={() => setShowTerms(false)} className="w-full">
               Ойлголоо
             </Button>
+          </DialogContent>
+        </Dialog>
+
+        {/* Forgot Password Dialog */}
+        <Dialog open={showForgotPassword} onOpenChange={setShowForgotPassword}>
+          <DialogContent className="max-w-md">
+            <DialogHeader>
+              <DialogTitle>Нууц үг сэргээх</DialogTitle>
+              <DialogDescription>
+                И-мэйл хаягаа оруулна уу. Нууц үг сэргээх заавар илгээх болно.
+              </DialogDescription>
+            </DialogHeader>
+            <form onSubmit={handleForgotPassword} className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="reset-email">И-мэйл хаяг</Label>
+                <div className="relative">
+                  <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    id="reset-email"
+                    type="email"
+                    placeholder="your@email.com"
+                    className="pl-10"
+                    value={resetEmail}
+                    onChange={(e) => setResetEmail(e.target.value)}
+                    required
+                  />
+                </div>
+              </div>
+              <div className="flex gap-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="flex-1"
+                  onClick={() => setShowForgotPassword(false)}
+                >
+                  Цуцлах
+                </Button>
+                <Button type="submit" className="flex-1" disabled={loading}>
+                  {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                  Илгээх
+                </Button>
+              </div>
+            </form>
           </DialogContent>
         </Dialog>
       </div>
