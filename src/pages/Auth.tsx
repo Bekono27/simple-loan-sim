@@ -45,6 +45,17 @@ export const Auth = () => {
   });
 
   useEffect(() => {
+    // Handle email confirmation redirects
+    const handleAuthStateChange = async (event: string, session: any) => {
+      if (event === 'SIGNED_IN' && session) {
+        // If user just signed in via email confirmation, redirect to dashboard
+        navigate("/dashboard");
+      } else if (event === 'TOKEN_REFRESHED' && session) {
+        // Also redirect on token refresh (email confirmation flow)
+        navigate("/dashboard");
+      }
+    };
+
     // Check if user is already logged in
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (session) {
@@ -53,11 +64,7 @@ export const Auth = () => {
     });
 
     // Listen for auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      if (event === 'SIGNED_IN' && session) {
-        navigate("/dashboard");
-      }
-    });
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(handleAuthStateChange);
 
     return () => subscription.unsubscribe();
   }, [navigate]);
