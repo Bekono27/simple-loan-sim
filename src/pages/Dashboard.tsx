@@ -124,7 +124,7 @@ export const Dashboard = () => {
         {/* Quick Actions */}
         <Card>
           <CardHeader>
-            <CardTitle>Хурдан үйлдэл</CardTitle>
+            <CardTitle>Үйлчилгээ</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-2 gap-3">
@@ -205,7 +205,7 @@ export const Dashboard = () => {
         {/* Simple Buy */}
         <Card>
           <CardHeader>
-            <CardTitle>Энгийн худалдаа</CardTitle>
+            <CardTitle>Fact buy</CardTitle>
             <CardDescription>Удахгүй...</CardDescription>
           </CardHeader>
           <CardContent>
