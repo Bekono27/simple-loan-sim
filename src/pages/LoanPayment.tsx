@@ -347,8 +347,8 @@ export const LoanPayment = () => {
                 onCheckedChange={(checked) => setAgreedToPay(!!checked)}
               />
               <Label htmlFor="paymentAgreement" className="text-sm leading-5">
-                Би {analysisfee.toLocaleString()}₮ төлбөр төлснийг ойлгож байна. 
-                Энэ төлбөр нь зээл олгохыг баталгаажуулдаггүй бөгөөд буцаагддаггүй.
+                Би {analysisfee.toLocaleString()}₮ төлбөр төлөхийг зөвшөөрч байна. 
+                Энэхүү төлбөр нь зээл олгох баталгаа биш бөгөөд буцаагддаггүй болохыг ойлгож байна.
               </Label>
             </div>
 
