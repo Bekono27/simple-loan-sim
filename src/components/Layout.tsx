@@ -1,8 +1,9 @@
 import { ReactNode } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Bell } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import { BottomNavigation } from "./BottomNavigation";
+import { NotificationBell } from "./NotificationBell";
 
 interface LayoutProps {
   children: ReactNode;
@@ -39,13 +40,7 @@ export const Layout = ({ children, title, showBack = true, showBottomNav = true 
           </div>
           
           {location.pathname === "/dashboard" && (
-            <Button
-              variant="ghost"
-              size="sm"
-              className="p-2 h-auto"
-            >
-              <Bell className="w-5 h-5" />
-            </Button>
+            <NotificationBell />
           )}
         </div>
       </header>
