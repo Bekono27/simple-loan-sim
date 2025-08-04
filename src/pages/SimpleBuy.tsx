@@ -80,7 +80,7 @@ export const SimpleBuy = () => {
           <div className="w-16 h-16 bg-warning/10 rounded-full flex items-center justify-center mx-auto mb-4">
             <ShoppingCart className="w-8 h-8 text-warning" />
           </div>
-          <h1 className="text-2xl font-bold mb-2">Утасны дэлгүүр</h1>
+          <h1 className="text-2xl font-bold mb-2">Fact shop</h1>
           <p className="text-muted-foreground">Утас худалдан аваад дараа нь хуваан төлөөрэй</p>
           <Badge variant="secondary" className="mt-2 bg-primary/10 text-primary">
             Удахгүй нээгдэнэ
@@ -98,7 +98,7 @@ export const SimpleBuy = () => {
 
         {/* Featured Phones */}
         <div>
-          <h3 className="font-semibold mb-4">Удахгүй нээгдэх утаснууд</h3>
+          <h3 className="font-semibold mb-4">Удахгүй худалдаалагдах утаснууд</h3>
           <div className="space-y-3">
             {mockPhones.map((phone) => (
               <Card key={phone.id} className="p-4 opacity-60">
