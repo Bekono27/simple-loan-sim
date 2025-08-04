@@ -212,7 +212,7 @@ export const AdminDashboard = () => {
         </div>
 
         {/* Quick Actions */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
@@ -252,9 +252,29 @@ export const AdminDashboard = () => {
               <p className="text-muted-foreground mb-4">
                 Бүх хэрэглэгчдийн мэдээлэл болон үйл ажиллагаа
               </p>
-              <Button variant="outline" className="w-full" disabled>
+              <Button onClick={() => navigate("/admrstb4")} variant="outline" className="w-full">
                 Хэрэглэгчдийн жагсаалт
-                <Badge variant="secondary" className="ml-2">Тун удахгүй</Badge>
+                <Badge variant="secondary" className="ml-2">{stats.totalUsers}</Badge>
+              </Button>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <TrendingUp className="w-5 h-5" />
+                Нийт гүйлгээ
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-muted-foreground mb-4">
+                Бүх гүйлгээний дэлгэрэнгүй мэдээлэл
+              </p>
+              <Button onClick={() => navigate("/admrstb5")} variant="outline" className="w-full">
+                Гүйлгээний тайлан
+                <Badge variant="secondary" className="ml-2">
+                  {stats.totalLoans + stats.pendingPayments + stats.verifiedPayments + stats.rejectedPayments}
+                </Badge>
               </Button>
             </CardContent>
           </Card>

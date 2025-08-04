@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -7,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
-import { CheckCircle, XCircle, Clock, Eye, Search, Copy, User, Phone, CreditCard, Calendar, Hash } from "lucide-react";
+import { CheckCircle, XCircle, Clock, Eye, Search, Copy, User, Phone, CreditCard, Calendar, Hash, ArrowLeft } from "lucide-react";
 
 interface PaymentVerification {
   id: string;
@@ -36,6 +37,7 @@ export const AdminPayments = () => {
   const [adminNotes, setAdminNotes] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetchPayments();
@@ -208,7 +210,15 @@ export const AdminPayments = () => {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <div className="flex items-center justify-between mb-8">
+      <div className="flex items-center gap-4 mb-8">
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={() => navigate("/admrstb1")}
+          className="rounded-full"
+        >
+          <ArrowLeft className="w-5 h-5" />
+        </Button>
         <h1 className="text-3xl font-bold">Төлбөрийн баталгаажуулалт</h1>
         <div className="flex gap-3">
           <Button onClick={fetchPayments} variant="outline">
