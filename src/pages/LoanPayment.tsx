@@ -180,7 +180,7 @@ export const LoanPayment = () => {
                 <h3 className="font-medium text-lg mb-2">Шинжилгээний зардал</h3>
                 <p className="text-2xl font-bold text-foreground mb-2">{analysisfee.toLocaleString()}₮</p>
                 <div className="text-sm space-y-1">
-                  <p>• Энэ төлбөр нь буцаагддаггүй</p>
+                  <p>• Энэ төлбөр нь буцаагдахгүй</p>
                   <p>• Зөвхөн мэдээллийн зорилготой шинжилгээ</p>
                 </div>
               </div>
@@ -322,8 +322,8 @@ export const LoanPayment = () => {
                   <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mt-4">
                     <h4 className="text-sm font-medium text-blue-900 mb-2">Админы баталгаажуулалт</h4>
                     <p className="text-xs text-blue-700">
-                      Төлбөр хийсний дараа админ таны төлбөрийг шалгаж баталгаажуулна. 
-                      Энэ нь 24 цагийн дотор хийгдэнэ.
+                      Төлбөр хийсний дараа ажилтан таны төлбөрийг шалгаж баталгаажуулна. 
+                       Бид танд 30 минутын дотор хариу өгнө.
                     </p>
                   </div>
                 </div>
