@@ -270,11 +270,14 @@ export const AdminDashboard = () => {
               <p className="text-muted-foreground mb-4">
                 Бүх гүйлгээний дэлгэрэнгүй мэдээлэл
               </p>
-              <Button onClick={() => navigate("/admrstb5")} variant="outline" className="w-full">
+              <Button onClick={() => navigate("/admrstb5")} variant="outline" className="w-full mb-2">
                 Гүйлгээний тайлан
                 <Badge variant="secondary" className="ml-2">
                   {stats.totalLoans + stats.pendingPayments + stats.verifiedPayments + stats.rejectedPayments}
                 </Badge>
+              </Button>
+              <Button onClick={() => navigate("/admrstb6")} variant="outline" className="w-full">
+                Системийн тохиргоо
               </Button>
             </CardContent>
           </Card>

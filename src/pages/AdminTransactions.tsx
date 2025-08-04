@@ -61,6 +61,14 @@ export const AdminTransactions = () => {
       return;
     }
 
+    const session = JSON.parse(adminSession);
+    // Check if session is expired (24 hours)
+    if (Date.now() - session.timestamp > 24 * 60 * 60 * 1000) {
+      localStorage.removeItem("adminSession");
+      navigate("/admrstb");
+      return;
+    }
+
     fetchAllTransactions();
   }, [navigate]);
 
