@@ -103,7 +103,7 @@ export const Support = () => {
               </div>
               <div>
                 <div className="font-medium">Имэйл тусламж</div>
-                <div className="text-sm text-muted-foreground">support@simpleloan.mn</div>
+                <div className="text-sm text-muted-foreground">adfactloan@gmail.com</div>
               </div>
             </div>
           </Card>
