@@ -90,6 +90,9 @@ export const LoanPayment = () => {
 
       const appData = JSON.parse(existingApp);
       
+      console.log('Current user:', user);
+      console.log('App data:', appData);
+      
       // First create the loan application record
       const { data: loanApp, error: loanError } = await supabase
         .from('loan_applications')
@@ -104,11 +107,13 @@ export const LoanPayment = () => {
         .select()
         .single();
 
+      console.log('Loan app result:', { loanApp, loanError });
+
       if (loanError) {
         console.error('Loan application error:', loanError);
         toast({
           title: "Алдаа",
-          description: "Зээлийн хүсэлт хадгалахад алдаа гарлаа",
+          description: `Зээлийн хүсэлт хадгалахад алдаа гарлаа: ${loanError.message}`,
           variant: "destructive"
         });
         setIsProcessing(false);
@@ -131,7 +136,7 @@ export const LoanPayment = () => {
         console.error('Payment verification error:', paymentError);
         toast({
           title: "Алдаа",
-          description: "Төлбөрийн мэдээлэл хадгалахад алдаа гарлаа",
+          description: `Төлбөрийн мэдээлэл хадгалахад алдаа гарлаа: ${paymentError.message}`,
           variant: "destructive"
         });
         setIsProcessing(false);
