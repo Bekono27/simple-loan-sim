@@ -90,23 +90,50 @@ export const AdminBankStatements = () => {
 
   const downloadBankStatement = async (url: string, filename: string) => {
     try {
-      const { data } = await supabase.storage.from('bank-statements').download(url);
-      if (data) {
-        const blob = new Blob([data]);
+      // Check if it's a sample statement (starts with sample_statements/)
+      if (url.startsWith('sample_statements/')) {
+        // For sample statements, we'll map them to our public sample files
+        let sampleFile = '';
+        if (url.includes('golomt_statement')) {
+          sampleFile = '/sample_bank_statements/golomt_statement_sample.txt';
+        } else if (url.includes('khan_statement')) {
+          sampleFile = '/sample_bank_statements/khan_statement_sample.txt';
+        } else {
+          // Use golomt as default for other sample statements
+          sampleFile = '/sample_bank_statements/golomt_statement_sample.txt';
+        }
+        
+        // Download from public folder
+        const response = await fetch(sampleFile);
+        const blob = await response.blob();
         const downloadUrl = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = downloadUrl;
-        a.download = filename || 'bank-statement.pdf';
+        a.download = filename || 'bank-statement.txt';
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
         URL.revokeObjectURL(downloadUrl);
-        
-        toast({
-          title: "Амжилттай",
-          description: "Файл татагдлаа"
-        });
+      } else {
+        // For real uploaded files, download from Supabase storage
+        const { data } = await supabase.storage.from('bank-statements').download(url);
+        if (data) {
+          const blob = new Blob([data]);
+          const downloadUrl = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = downloadUrl;
+          a.download = filename || 'bank-statement.pdf';
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          URL.revokeObjectURL(downloadUrl);
+        }
       }
+      
+      toast({
+        title: "Амжилттай",
+        description: "Файл татагдлаа"
+      });
     } catch (error) {
       console.error('Error downloading file:', error);
       toast({
