@@ -62,30 +62,28 @@ export const AdminLoanReview = () => {
 
   const fetchLoans = async () => {
     try {
-      const { data, error } = await supabase
-        .from('loan_applications')
-        .select(`
-          *,
-          profiles (
-            full_name,
-            phone_number,
-            register_number,
-            credit_score,
-            email,
-            user_id
-          )
-        `)
-        .order('created_at', { ascending: false });
+      // Use admin function to get all loan applications
+      const { data: loansData, error } = await supabase.rpc('admin_get_all_loan_applications');
 
       if (error) throw error;
-      
-      // Transform the data to match our interface
-      const transformedData = (data || []).map((loan: any) => ({
-        ...loan,
-        profiles: loan.profiles || null
-      }));
-      
-      setLoans(transformedData);
+
+      // Then fetch user profiles separately and merge
+      const enrichedLoans = await Promise.all(
+        (loansData || []).map(async (loan) => {
+          const { data: profile } = await supabase
+            .from('profiles')
+            .select('full_name, phone_number, register_number, email, credit_score, user_id')
+            .eq('user_id', loan.user_id)
+            .maybeSingle();
+
+          return {
+            ...loan,
+            profiles: profile
+          };
+        })
+      );
+
+      setLoans(enrichedLoans);
     } catch (error) {
       console.error('Error fetching loans:', error);
       toast({

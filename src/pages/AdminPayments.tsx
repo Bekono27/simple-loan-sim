@@ -64,11 +64,8 @@ export const AdminPayments = () => {
 
   const fetchPayments = async () => {
     try {
-      // First fetch payment verifications
-      const { data: paymentsData, error: paymentsError } = await supabase
-        .from('payment_verifications')
-        .select('*')
-        .order('created_at', { ascending: false });
+      // Use admin function to get all payment verifications
+      const { data: paymentsData, error: paymentsError } = await supabase.rpc('admin_get_all_payment_verifications');
 
       if (paymentsError) throw paymentsError;
 
@@ -135,52 +132,15 @@ export const AdminPayments = () => {
     try {
       const { data: { user } } = await supabase.auth.getUser();
       
-      // Update payment verification status
-      const { error: paymentError } = await supabase
-        .from('payment_verifications')
-        .update({
-          status,
-          admin_notes: notes,
-          verified_by: user?.id,
-          verified_at: new Date().toISOString()
-        })
-        .eq('id', paymentId);
+      // Use admin function to update payment verification
+      const { error } = await supabase.rpc('admin_update_payment_verification', {
+        payment_id: paymentId,
+        new_status: status,
+        notes: notes,
+        admin_id: user?.id
+      });
 
-      if (paymentError) throw paymentError;
-
-      // If payment is verified, also update the loan application status
-      if (status === 'verified') {
-        const payment = payments.find(p => p.id === paymentId);
-        if (payment?.loan_application_id) {
-          const { error: loanError } = await supabase
-            .from('loan_applications')
-            .update({
-              payment_status: 'paid',
-              status: 'payment_verified'
-            })
-            .eq('id', payment.loan_application_id);
-
-          if (loanError) {
-            console.error('Error updating loan application:', loanError);
-          }
-        }
-      } else if (status === 'rejected') {
-        // If payment is rejected, update loan application to rejected
-        const payment = payments.find(p => p.id === paymentId);
-        if (payment?.loan_application_id) {
-          const { error: loanError } = await supabase
-            .from('loan_applications')
-            .update({
-              payment_status: 'rejected',
-              status: 'payment_rejected'
-            })
-            .eq('id', payment.loan_application_id);
-
-          if (loanError) {
-            console.error('Error updating loan application:', loanError);
-          }
-        }
-      }
+      if (error) throw error;
 
       toast({
         title: "Амжилттай",

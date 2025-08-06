@@ -337,6 +337,15 @@ export type Database = {
           payments: Json
         }[]
       }
+      admin_update_payment_verification: {
+        Args: {
+          payment_id: string
+          new_status: string
+          notes?: string
+          admin_id?: string
+        }
+        Returns: boolean
+      }
       get_current_user_role: {
         Args: Record<PropertyKey, never>
         Returns: Database["public"]["Enums"]["app_role"]
