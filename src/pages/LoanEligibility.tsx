@@ -43,7 +43,17 @@ export const LoanEligibility = () => {
     if (!bankStatement) {
       toast({
         title: "Алдаа", 
-        description: "Санхүүгийн баримт бичгээ оруулна уу",
+        description: "Баримт бичгээ оруулна уу",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    // Check file size (150MB limit)
+    if (bankStatement.size > 150 * 1024 * 1024) {
+      toast({
+        title: "Алдаа",
+        description: "Файлын хэмжээ хэт том байна. 150MB-аас бага файл оруулна уу.",
         variant: "destructive"
       });
       return;
@@ -52,68 +62,29 @@ export const LoanEligibility = () => {
     setIsCalculating(true);
 
     try {
-      // Convert file to base64 for verification
-      const fileReader = new FileReader();
-      fileReader.onload = async (e) => {
-        const fileContent = e.target?.result as string;
-        
-        try {
-          // Verify if it's actually a bank statement
-          const { data: verificationResult, error } = await supabase.functions.invoke('verify-bank-statement', {
-            body: {
-              fileContent: fileContent.substring(0, 10000), // First 10k chars for analysis
-              fileName: bankStatement.name,
-              fileType: bankStatement.type
-            }
-          });
-
-          if (error) {
-            throw new Error('Санхүүгийн баримт шалгахад алдаа гарлаа');
-          }
-
-          if (!verificationResult.isValid) {
-            setIsCalculating(false);
-            toast({
-              title: "Файл буруу байна",
-              description: `${verificationResult.reason} Санхүүгийн баримт бичиг оруулна уу.`,
-              variant: "destructive"
-            });
-            return;
-          }
-
-          // Store loan application data
-          const applicationData = {
-            loanAmount: Number(loanAmount),
-            bankStatementFile: bankStatement.name,
-            applicationDate: new Date().toISOString(),
-            status: "pending_payment",
-            verificationResult: verificationResult
-          };
-
-          localStorage.setItem("loanApplication", JSON.stringify(applicationData));
-
-          // Simulate processing time
-          setTimeout(() => {
-            setIsCalculating(false);
-            navigate("/loan-payment");
-          }, 2000);
-
-        } catch (error) {
-          setIsCalculating(false);
-          toast({
-            title: "Алдаа гарлаа",
-            description: "Санхүүгийн баримт шалгахад алдаа гарлаа",
-            variant: "destructive"
-          });
-        }
+      // Store loan application data without verification
+      const applicationData = {
+        loanAmount: Number(loanAmount),
+        bankStatementFile: bankStatement.name,
+        applicationDate: new Date().toISOString(),
+        status: "pending_payment",
+        fileSize: bankStatement.size,
+        fileType: bankStatement.type
       };
 
-      fileReader.readAsText(bankStatement);
+      localStorage.setItem("loanApplication", JSON.stringify(applicationData));
+
+      // Simulate processing time
+      setTimeout(() => {
+        setIsCalculating(false);
+        navigate("/loan-payment");
+      }, 1500);
+
     } catch (error) {
       setIsCalculating(false);
       toast({
         title: "Алдаа гарлаа",
-        description: "Файл уншихад алдаа гарлаа",
+        description: "Файл боловсруулахад алдаа гарлаа",
         variant: "destructive"
       });
     }
@@ -125,8 +96,8 @@ export const LoanEligibility = () => {
         <Card className="neu-card max-w-sm mx-4">
           <CardContent className="text-center py-8">
             <div className="w-16 h-16 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-            <h3 className="text-lg font-medium mb-2">Санхүүгийн баримт шалгаж байна...</h3>
-            <p className="text-muted-foreground">Таны файлыг шинжилж байна</p>
+            <h3 className="text-lg font-medium mb-2">Таны хүсэлтийг боловсруулж байна...</h3>
+            <p className="text-muted-foreground">Түр хүлээнэ үү</p>
           </CardContent>
         </Card>
       </div>
@@ -209,12 +180,11 @@ export const LoanEligibility = () => {
                     <div className="text-center">
                       <p className="text-sm font-medium">Файл оруулах</p>
                       <p className="text-xs text-muted-foreground">
-                        Бүх төрлийн баримт бичиг (10MB хүртэл)
+                        Бүх төрлийн баримт бичиг (150MB хүртэл)
                       </p>
                     </div>
                     <input
                       type="file"
-                      accept=".pdf,.jpg,.jpeg,.png,.doc,.docx,.xls,.xlsx,.txt"
                       onChange={handleFileChange}
                       className="hidden"
                     />
@@ -223,16 +193,8 @@ export const LoanEligibility = () => {
               </div>
               <div className="mt-2 space-y-1">
                 <p className="text-xs text-muted-foreground">
-                  Зөвшөөрөгдсөн баримт бичиг:
+                  Бүх төрлийн баримт бичиг хүлээн авагдана. Админ хянаж батална.
                 </p>
-                <ul className="text-xs text-muted-foreground grid grid-cols-2 gap-1">
-                  <li>• Банкны хуулга</li>
-                  <li>• Цалингийн хуулга</li>
-                  <li>• Хадгаламжийн данс</li>
-                  <li>• Хөрөнгийн гэрчилгээ</li>
-                  <li>• Орлогын тодорхойлолт</li>
-                  <li>• Бизнесийн орлого</li>
-                </ul>
               </div>
             </div>
 
