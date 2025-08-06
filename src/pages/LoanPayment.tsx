@@ -93,14 +93,20 @@ export const LoanPayment = () => {
       console.log('Current user:', user);
       console.log('App data:', appData);
       
+      // Get amount from different possible sources
+      const loanAmount = appData.amount || appData.loanAmount || appData.requestedAmount || 0;
+      
+      console.log('Loan amount extracted:', loanAmount);
+      
       // Validate required fields
-      if (!appData.amount || appData.amount <= 0) {
+      if (!loanAmount || loanAmount <= 0) {
         toast({
           title: "Алдаа",
-          description: "Зээлийн дүн олдсонгүй. Дахин оролдоно уу.",
+          description: "Зээлийн дүн олдсонгүй. Зээлийн хүсэлтээ дахин үүсгэнэ үү.",
           variant: "destructive"
         });
         setIsProcessing(false);
+        navigate("/loan-application");
         return;
       }
       
@@ -109,7 +115,7 @@ export const LoanPayment = () => {
         .from('loan_applications')
         .insert({
           user_id: user.id,
-          amount: parseInt(appData.amount) || 0,
+          amount: parseFloat(loanAmount),
           status: 'pending',
           eligibility_result: appData.eligibility_result || null,
           bank_statement_url: appData.bank_statement_url || null,
