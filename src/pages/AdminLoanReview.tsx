@@ -1,44 +1,36 @@
+
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
-import { CheckCircle, XCircle, FileText, Eye, ArrowLeft, Download, User } from "lucide-react";
+import { ArrowLeft, Download, FileText, User, Phone, Banknote } from "lucide-react";
 
 interface LoanApplication {
   id: string;
   user_id: string;
   amount: number;
   status: string;
-  eligibility_result: string;
+  payment_status: string;
+  eligibility_result?: string;
   bank_statement_filename?: string;
   bank_statement_url?: string;
   created_at: string;
-  max_loan_amount?: number;
-  interest_rate?: number;
   profiles?: {
     full_name: string;
     phone_number?: string;
-    register_number?: string;
-    credit_score?: number;
     email?: string;
-    user_id: string;
   } | null;
 }
 
 export const AdminLoanReview = () => {
-  const [loans, setLoans] = useState<LoanApplication[]>([]);
+  const [applications, setApplications] = useState<LoanApplication[]>([]);
   const [loading, setLoading] = useState(true);
-  const [selectedLoan, setSelectedLoan] = useState<LoanApplication | null>(null);
-  const [adminNotes, setAdminNotes] = useState("");
-  const [approvedAmount, setApprovedAmount] = useState("");
-  const [interestRate, setInterestRate] = useState("");
-  const [creditScore, setCreditScore] = useState("");
+  const [updatingId, setUpdatingId] = useState<string | null>(null);
+  const [adminNotes, setAdminNotes] = useState<{ [key: string]: string }>({});
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -57,22 +49,22 @@ export const AdminLoanReview = () => {
       return;
     }
 
-    fetchLoans();
+    fetchLoanApplications();
   }, [navigate]);
 
-  const fetchLoans = async () => {
+  const fetchLoanApplications = async () => {
     try {
-      // Use admin function to get all loan applications
+      // Get all loan applications
       const { data: loansData, error } = await supabase.rpc('admin_get_all_loan_applications');
 
       if (error) throw error;
 
-      // Then fetch user profiles separately and merge
-      const enrichedLoans = await Promise.all(
+      // Enrich with profile data
+      const enrichedApplications = await Promise.all(
         (loansData || []).map(async (loan) => {
           const { data: profile } = await supabase
             .from('profiles')
-            .select('full_name, phone_number, register_number, email, credit_score, user_id')
+            .select('full_name, phone_number, email')
             .eq('user_id', loan.user_id)
             .maybeSingle();
 
@@ -83,12 +75,12 @@ export const AdminLoanReview = () => {
         })
       );
 
-      setLoans(enrichedLoans);
+      setApplications(enrichedApplications);
     } catch (error) {
-      console.error('Error fetching loans:', error);
+      console.error('Error fetching loan applications:', error);
       toast({
         title: "Алдаа",
-        description: "Факт зээлийн хүсэлт татахад алдаа гарлаа",
+        description: "Зээлийн хүсэлтийг татахад алдаа гарлаа",
         variant: "destructive"
       });
     } finally {
@@ -96,45 +88,133 @@ export const AdminLoanReview = () => {
     }
   };
 
-  const updateLoanStatus = async (loanId: string, status: 'approved' | 'rejected', notes: string, maxAmount?: number, interestRate?: number) => {
+  const downloadBankStatement = async (url: string, filename: string) => {
     try {
-      const updateData: any = {
-        status,
-        eligibility_result: notes,
-        updated_at: new Date().toISOString()
-      };
-
-      // If approved, add loan details
-      if (status === 'approved' && maxAmount && interestRate) {
-        updateData.max_loan_amount = maxAmount;
-        updateData.interest_rate = interestRate;
+      // Check if it's a sample statement (starts with sample_statements/)
+      if (url.startsWith('sample_statements/')) {
+        // For sample statements, we'll map them to our public sample files
+        let sampleFile = '';
+        if (url.includes('golomt_statement')) {
+          sampleFile = '/sample_bank_statements/golomt_statement_sample.txt';
+        } else if (url.includes('khan_statement')) {
+          sampleFile = '/sample_bank_statements/khan_statement_sample.txt';
+        } else {
+          // Use golomt as default for other sample statements
+          sampleFile = '/sample_bank_statements/golomt_statement_sample.txt';
+        }
+        
+        // Download from public folder
+        const response = await fetch(sampleFile);
+        const blob = await response.blob();
+        const downloadUrl = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = downloadUrl;
+        a.download = filename || 'bank-statement.txt';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(downloadUrl);
+      } else {
+        // For real uploaded files, download from Supabase storage
+        const { data } = await supabase.storage.from('bank-statements').download(url);
+        if (data) {
+          const blob = new Blob([data]);
+          const downloadUrl = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = downloadUrl;
+          a.download = filename || 'bank-statement.pdf';
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          URL.revokeObjectURL(downloadUrl);
+        }
       }
       
-      const { error } = await supabase
+      toast({
+        title: "Амжилттай",
+        description: "Файл татагдлаа"
+      });
+    } catch (error) {
+      console.error('Error downloading file:', error);
+      toast({
+        title: "Алдаа",
+        description: "Файл татахад алдаа гарлаа",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const updateLoanStatus = async (loanId: string, newStatus: 'approved' | 'rejected') => {
+    setUpdatingId(loanId);
+    try {
+      const notes = adminNotes[loanId] || '';
+
+      // First create a payment verification record with admin notes
+      const { data: paymentData, error: paymentError } = await supabase
+        .from('payment_verifications')
+        .insert({
+          user_id: applications.find(app => app.id === loanId)?.user_id,
+          loan_application_id: loanId,
+          amount: 0, // Placeholder amount since this is for admin decision tracking
+          payment_method: 'admin_decision',
+          reference_number: `admin_${Date.now()}`,
+          status: newStatus === 'approved' ? 'verified' : 'rejected',
+          admin_notes: notes,
+          verified_at: new Date().toISOString(),
+        })
+        .select()
+        .single();
+
+      if (paymentError) throw paymentError;
+
+      // Then update the loan application
+      const { error: loanError } = await supabase
         .from('loan_applications')
-        .update(updateData)
+        .update({ 
+          status: newStatus,
+          payment_status: newStatus === 'approved' ? 'paid' : 'unpaid',
+          updated_at: new Date().toISOString()
+        })
         .eq('id', loanId);
 
-      if (error) throw error;
+      if (loanError) throw loanError;
+
+      // Create notification for user
+      const application = applications.find(app => app.id === loanId);
+      if (application) {
+        await supabase
+          .from('notifications')
+          .insert({
+            user_id: application.user_id,
+            title: newStatus === 'approved' ? 'Зээл зөвшөөрөгдсөн! 🎉' : 'Зээлийн хүсэлт татгалзагдлаа',
+            message: newStatus === 'approved' 
+              ? `Таны ${application.amount.toLocaleString()}₮ зээлийн хүсэлт зөвшөөрөгдлөө!${notes ? ` Шалтгаан: ${notes}` : ''}`
+              : `Таны зээлийн хүсэлт татгалзагдлаа.${notes ? ` Шалтгаан: ${notes}` : ''}`,
+            type: newStatus === 'approved' ? 'success' : 'error',
+            related_id: loanId,
+            related_type: 'loan_application'
+          });
+      }
 
       toast({
         title: "Амжилттай",
-        description: `Факт зээлийн хүсэлт ${status === 'approved' ? 'зөвшөөрөгдлөө' : 'татгалзлаа'}`
+        description: `Зээлийн хүсэлт ${newStatus === 'approved' ? 'зөвшөөрөгдлөө' : 'татгалзагдлаа'}`
       });
 
-      fetchLoans();
-      setSelectedLoan(null);
-      setAdminNotes("");
-      setApprovedAmount("");
-      setInterestRate("");
-      setCreditScore("");
+      // Clear the admin note for this application
+      setAdminNotes(prev => ({ ...prev, [loanId]: '' }));
+
+      // Refresh the applications list
+      fetchLoanApplications();
     } catch (error) {
-      console.error('Error updating loan:', error);
+      console.error('Error updating loan status:', error);
       toast({
         title: "Алдаа",
         description: "Зээлийн статус шинэчлэхэд алдаа гарлаа",
         variant: "destructive"
       });
+    } finally {
+      setUpdatingId(null);
     }
   };
 
@@ -143,34 +223,11 @@ export const AdminLoanReview = () => {
       case 'pending':
         return <Badge variant="outline" className="bg-yellow-50 text-yellow-700 border-yellow-200">Хүлээгдэж байна</Badge>;
       case 'approved':
-        return <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200"><CheckCircle className="w-3 h-3 mr-1" />Зөвшөөрөгдсөн</Badge>;
+        return <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">Зөвшөөрөгдсөн</Badge>;
       case 'rejected':
-        return <Badge variant="outline" className="bg-red-50 text-red-700 border-red-200"><XCircle className="w-3 h-3 mr-1" />Татгалзсан</Badge>;
+        return <Badge variant="outline" className="bg-red-50 text-red-700 border-red-200">Татгалзсан</Badge>;
       default:
         return <Badge variant="outline">{status}</Badge>;
-    }
-  };
-
-  const downloadBankStatement = async (url: string, filename: string) => {
-    try {
-      const { data } = await supabase.storage.from('bank-statements').download(url);
-      if (data) {
-        const blob = new Blob([data]);
-        const downloadUrl = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = downloadUrl;
-        a.download = filename || 'bank-statement.pdf';
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(downloadUrl);
-      }
-    } catch (error) {
-      toast({
-        title: "Алдаа",
-        description: "Файл татахад алдаа гарлаа",
-        variant: "destructive"
-      });
     }
   };
 
@@ -195,42 +252,56 @@ export const AdminLoanReview = () => {
         >
           <ArrowLeft className="w-5 h-5" />
         </Button>
-        <h1 className="text-3xl font-bold">Факт зээлийн хүсэлт шалгах</h1>
-        <Button onClick={fetchLoans} variant="outline">
+        <h1 className="text-3xl font-bold">Зээлийн хүсэлт шалгах</h1>
+        <Button onClick={fetchLoanApplications} variant="outline">
           Шинэчлэх
         </Button>
       </div>
 
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-        {loans.map((loan) => (
-          <Card key={loan.id} className="hover:shadow-lg transition-shadow">
+        {applications.map((app) => (
+          <Card key={app.id} className="hover:shadow-lg transition-shadow">
             <CardHeader className="pb-3">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
+              <div className="flex items-center justify-between mb-2">
+                <CardTitle className="text-lg flex items-center gap-2">
                   <User className="w-4 h-4" />
-                  <CardTitle className="text-lg">{loan.profiles?.full_name || 'Нэр тодорхойгүй'}</CardTitle>
-                </div>
-                {getStatusBadge(loan.status)}
+                  {app.profiles?.full_name || 'Нэр тодорхойгүй'}
+                </CardTitle>
+                {getStatusBadge(app.status)}
               </div>
               <p className="text-sm text-muted-foreground">
-                {new Date(loan.created_at).toLocaleDateString('mn-MN')}
+                {new Date(app.created_at).toLocaleDateString('mn-MN')}
               </p>
             </CardHeader>
-            <CardContent className="space-y-3">
-              <div className="grid grid-cols-2 gap-4 text-sm">
-                <div>
-                  <p className="font-medium">Зээлийн дүн:</p>
-                  <p className="text-muted-foreground">{loan.amount.toLocaleString()}₮</p>
+            <CardContent className="space-y-4">
+              {/* User Information */}
+              <div className="space-y-2">
+                <div className="flex items-center gap-2">
+                  <Phone className="w-4 h-4" />
+                  <span className="text-sm font-medium">Утас:</span>
+                  <span className="text-sm text-muted-foreground">
+                    {app.profiles?.phone_number || 'Байхгүй'}
+                  </span>
                 </div>
-                <div>
-                  <p className="font-medium">Утас:</p>
-                  <p className="text-muted-foreground">{loan.profiles?.phone_number || 'Байхгүй'}</p>
+                <div className="flex items-center gap-2">
+                  <Banknote className="w-4 h-4" />
+                  <span className="text-sm font-medium">Зээлийн дүн:</span>
+                  <span className="text-sm font-semibold text-primary">
+                    {app.amount.toLocaleString()}₮
+                  </span>
+                </div>
+                <div className="text-sm">
+                  <span className="font-medium">И-мэйл:</span>
+                  <span className="text-muted-foreground ml-1">
+                    {app.profiles?.email || 'Байхгүй'}
+                  </span>
                 </div>
               </div>
-              
-              {loan.bank_statement_filename && (
+
+              {/* Bank Statement */}
+              {app.bank_statement_filename && app.bank_statement_url && (
                 <div className="p-3 bg-muted rounded-lg">
-                  <div className="flex items-center justify-between">
+                  <div className="flex items-center justify-between mb-2">
                     <div className="flex items-center gap-2">
                       <FileText className="w-4 h-4" />
                       <span className="text-sm font-medium">Банкны баримт</span>
@@ -238,39 +309,57 @@ export const AdminLoanReview = () => {
                     <Button
                       size="sm"
                       variant="ghost"
-                      onClick={() => downloadBankStatement(loan.bank_statement_url!, loan.bank_statement_filename!)}
+                      onClick={() => downloadBankStatement(app.bank_statement_url!, app.bank_statement_filename!)}
+                      className="h-8 w-8 p-0"
                     >
                       <Download className="w-4 h-4" />
                     </Button>
                   </div>
-                  <p className="text-xs text-muted-foreground mt-1">{loan.bank_statement_filename}</p>
+                  <p className="text-xs text-muted-foreground">{app.bank_statement_filename}</p>
                 </div>
               )}
 
-              {loan.eligibility_result && (
-                <div className="p-3 bg-muted rounded-lg">
-                  <p className="text-sm font-medium mb-1">Шинжилгээний үр дүн:</p>
-                  <p className="text-xs text-muted-foreground">{loan.eligibility_result}</p>
+              {/* Admin Actions for Pending Applications */}
+              {app.status === 'pending' && (
+                <div className="space-y-3">
+                  <Textarea
+                    placeholder="Админы тэмдэглэл (шалтгаан)..."
+                    value={adminNotes[app.id] || ''}
+                    onChange={(e) => setAdminNotes(prev => ({ ...prev, [app.id]: e.target.value }))}
+                    className="text-sm"
+                    rows={3}
+                  />
+                  <div className="flex gap-2">
+                    <Button
+                      onClick={() => updateLoanStatus(app.id, 'approved')}
+                      className="flex-1 bg-green-600 hover:bg-green-700"
+                      disabled={updatingId === app.id}
+                    >
+                      {updatingId === app.id ? 'Боловсруулж байна...' : 'Зөвшөөрөх'}
+                    </Button>
+                    <Button
+                      onClick={() => updateLoanStatus(app.id, 'rejected')}
+                      variant="destructive"
+                      className="flex-1"
+                      disabled={updatingId === app.id}
+                    >
+                      {updatingId === app.id ? 'Боловсруулж байна...' : 'Татгалзах'}
+                    </Button>
+                  </div>
                 </div>
               )}
 
-              {loan.status === 'pending' && (
-                <div className="flex gap-2 pt-2">
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={() => {
-                      setSelectedLoan(loan);
-                      setAdminNotes(loan.eligibility_result || "");
-                      setApprovedAmount(loan.amount.toString());
-                      setInterestRate("15");
-                      setCreditScore(loan.profiles?.credit_score?.toString() || "0");
-                    }}
-                    className="flex-1"
-                  >
-                    <Eye className="w-4 h-4 mr-1" />
-                    Шалгах
-                  </Button>
+              {/* Show existing admin notes for processed applications */}
+              {(app.status === 'approved' || app.status === 'rejected') && app.eligibility_result && (
+                <div className={`p-3 rounded-lg ${
+                  app.status === 'approved' 
+                    ? 'bg-green-50 border border-green-200' 
+                    : 'bg-red-50 border border-red-200'
+                }`}>
+                  <p className="text-sm font-medium mb-1">
+                    {app.status === 'approved' ? 'Зөвшөөрлийн шалтгаан:' : 'Татгалзсан шалтгаан:'}
+                  </p>
+                  <p className="text-xs text-muted-foreground">{app.eligibility_result}</p>
                 </div>
               )}
             </CardContent>
@@ -278,221 +367,10 @@ export const AdminLoanReview = () => {
         ))}
       </div>
 
-      {loans.length === 0 && (
+      {applications.length === 0 && (
         <div className="text-center py-12">
-          <p className="text-muted-foreground">Факт зээлийн хүсэлт олдсонгүй</p>
-        </div>
-      )}
-
-      {/* Loan Review Modal */}
-      {selectedLoan && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
-          <Card className="w-full max-w-2xl max-h-[90vh] overflow-y-auto">
-            <CardHeader>
-              <CardTitle>Факт зээлийн хүсэлт шалгах</CardTitle>
-              <p className="text-sm text-muted-foreground">
-                {selectedLoan.profiles?.full_name} - {selectedLoan.amount.toLocaleString()}₮
-              </p>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid grid-cols-2 gap-4 text-sm">
-                <div>
-                  <p className="font-medium">Хэрэглэгчийн нэр:</p>
-                  <p>{selectedLoan.profiles?.full_name}</p>
-                </div>
-                <div>
-                  <p className="font-medium">И-мэйл:</p>
-                  <p>{selectedLoan.profiles?.email || 'Байхгүй'}</p>
-                </div>
-                <div>
-                  <p className="font-medium">Утасны дугаар:</p>
-                  <p>{selectedLoan.profiles?.phone_number || 'Байхгүй'}</p>
-                </div>
-                <div>
-                  <p className="font-medium">Регистрийн дугаар:</p>
-                  <p>{selectedLoan.profiles?.register_number || 'Байхгүй'}</p>
-                </div>
-                <div>
-                  <p className="font-medium">Зээлийн дүн:</p>
-                  <p>{selectedLoan.amount.toLocaleString()}₮</p>
-                </div>
-                <div>
-                  <p className="font-medium">Хүсэлт гаргасан огноо:</p>
-                  <p>{new Date(selectedLoan.created_at).toLocaleDateString('mn-MN')}</p>
-                </div>
-                <div>
-                  <p className="font-medium">Одоогийн зээлийн оноо:</p>
-                  <p className="font-semibold text-primary">{selectedLoan.profiles?.credit_score || 0} оноо</p>
-                </div>
-              </div>
-
-              {/* Bank Statement Section */}
-              {selectedLoan.bank_statement_filename && (
-                <div className="p-4 border rounded-lg bg-muted/30">
-                  <div className="flex items-center justify-between mb-2">
-                    <h4 className="font-medium flex items-center gap-2">
-                      <FileText className="w-4 h-4" />
-                      Санхүүгийн баримт бичиг
-                    </h4>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={() => downloadBankStatement(selectedLoan.bank_statement_url!, selectedLoan.bank_statement_filename!)}
-                    >
-                      <Download className="w-4 h-4 mr-1" />
-                      Татах
-                    </Button>
-                  </div>
-                  <p className="text-sm text-muted-foreground mb-2">{selectedLoan.bank_statement_filename}</p>
-                  <div className="text-sm">
-                    <p className="font-medium text-green-600">✓ Файл баталгаажсан</p>
-                    <p className="text-muted-foreground">Банкны хуулга гэж тодорхойлогдсон</p>
-                  </div>
-                </div>
-              )}
-
-
-              <div>
-                <label className="text-sm font-medium mb-2 block">Шинжилгээний тайлбар:</label>
-                <Textarea
-                  value={adminNotes}
-                  onChange={(e) => setAdminNotes(e.target.value)}
-                  placeholder="Факт зээлийн хүсэлтийн талаарх тайлбар бичих..."
-                  rows={3}
-                />
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor="approvedAmount">Зөвшөөрөх дүн (₮)</Label>
-                  <Input
-                    id="approvedAmount"
-                    type="number"
-                    value={approvedAmount}
-                    onChange={(e) => setApprovedAmount(e.target.value)}
-                    placeholder="Зөвшөөрөх зээлийн дүн"
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="interestRate">Хүүгийн хэмжээ (%)</Label>
-                  <Input
-                    id="interestRate"
-                    type="number"
-                    step="0.1"
-                    value={interestRate}
-                    onChange={(e) => setInterestRate(e.target.value)}
-                    placeholder="Жилийн хүү"
-                  />
-                </div>
-              </div>
-
-              {/* Credit Score Section */}
-              <div className="border-t pt-4">
-                <Label htmlFor="creditScore">Зээлийн оноо тохируулах</Label>
-                <div className="flex items-center gap-4 mt-2">
-                  <Input
-                    id="creditScore"
-                    type="number"
-                    min="0"
-                    max="100"
-                    value={creditScore}
-                    onChange={(e) => setCreditScore(e.target.value)}
-                    placeholder="0-100"
-                    className="w-24"
-                  />
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={async () => {
-                      const score = parseInt(creditScore);
-                      if (isNaN(score) || score < 0 || score > 100) {
-                        toast({
-                          title: "Алдаа",
-                          description: "Зээлийн оноо 0-100 хооронд байх ёстой",
-                          variant: "destructive"
-                        });
-                        return;
-                      }
-
-                      try {
-                        const { error } = await supabase
-                          .from('profiles')
-                          .update({
-                            credit_score: score,
-                            score_updated_at: new Date().toISOString(),
-                            score_updated_by: (await supabase.auth.getUser()).data.user?.id
-                          })
-                          .eq('user_id', selectedLoan.profiles?.user_id);
-
-                        if (error) throw error;
-
-                        toast({
-                          title: "Амжилттай",
-                          description: `Зээлийн оноо ${score} болж шинэчлэгдлээ`
-                        });
-
-                        fetchLoans();
-                      } catch (error) {
-                        toast({
-                          title: "Алдаа", 
-                          description: "Зээлийн оноо шинэчлэхэд алдаа гарлаа",
-                          variant: "destructive"
-                        });
-                      }
-                    }}
-                  >
-                    Оноо шинэчлэх
-                  </Button>
-                </div>
-                <p className="text-xs text-muted-foreground mt-1">
-                  Өндөр оноо = зээл авах боломж өндөр (0-100 оноо)
-                </p>
-              </div>
-
-              <div className="flex gap-2">
-                <Button
-                  variant="outline"
-                  className="flex-1"
-                  onClick={() => {
-                    setSelectedLoan(null);
-                    setAdminNotes("");
-                    setApprovedAmount("");
-                    setInterestRate("");
-                    setCreditScore("");
-                  }}
-                >
-                  Цуцлах
-                </Button>
-                <Button
-                  variant="destructive"
-                  className="flex-1"
-                  onClick={() => updateLoanStatus(selectedLoan.id, 'rejected', adminNotes)}
-                >
-                  <XCircle className="w-4 h-4 mr-1" />
-                  Татгалзах
-                </Button>
-                <Button
-                  className="flex-1"
-                  onClick={() => {
-                    const amount = parseFloat(approvedAmount);
-                    const rate = parseFloat(interestRate);
-                    if (!amount || !rate) {
-                      toast({
-                        title: "Алдаа",
-                        description: "Зөвшөөрөх дүн болон хүүгийн хэмжээг оруулна уу",
-                        variant: "destructive"
-                      });
-                      return;
-                    }
-                    updateLoanStatus(selectedLoan.id, 'approved', adminNotes, amount, rate);
-                  }}
-                >
-                  <CheckCircle className="w-4 h-4 mr-1" />
-                  Зөвшөөрөх
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
+          <FileText className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
+          <p className="text-muted-foreground">Зээлийн хүсэлт олдсонгүй</p>
         </div>
       )}
     </div>
