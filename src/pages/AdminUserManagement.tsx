@@ -68,10 +68,7 @@ export const AdminUserManagement = () => {
 
   const fetchUsers = async () => {
     try {
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('*')
-        .order('created_at', { ascending: false });
+      const { data, error } = await supabase.rpc('admin_get_all_profiles');
 
       if (error) throw error;
       setUsers(data || []);
@@ -89,31 +86,18 @@ export const AdminUserManagement = () => {
 
   const fetchUserActivity = async (userId: string) => {
     try {
-      // Fetch user's loan applications
-      const { data: loans } = await supabase
-        .from('loan_applications')
-        .select('*')
-        .eq('user_id', userId)
-        .order('created_at', { ascending: false });
+      // Use admin function to get user activity
+      const { data, error } = await supabase.rpc('admin_get_user_activity', {
+        target_user_id: userId
+      });
 
-      // Fetch user's payment verifications
-      const { data: payments } = await supabase
-        .from('payment_verifications')
-        .select('*')
-        .eq('user_id', userId)
-        .order('created_at', { ascending: false });
+      if (error) throw error;
 
-      // Fetch user's P2P loans
-      const { data: p2pLoans } = await supabase
-        .from('p2p_loans')
-        .select('*')
-        .or(`lender_id.eq.${userId},borrower_id.eq.${userId}`)
-        .order('created_at', { ascending: false });
-
+      const activityData = data[0];
       setUserActivity({
-        loans: loans || [],
-        payments: payments || [],
-        documents: p2pLoans || []
+        loans: Array.isArray(activityData?.loans) ? activityData.loans : [],
+        payments: Array.isArray(activityData?.payments) ? activityData.payments : [],
+        documents: [] // P2P loans not needed for now
       });
     } catch (error) {
       console.error('Error fetching user activity:', error);

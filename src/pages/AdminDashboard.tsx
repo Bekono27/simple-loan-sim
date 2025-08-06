@@ -57,24 +57,18 @@ export const AdminDashboard = () => {
 
   const loadDashboardData = async () => {
     try {
-      // Get total users from profiles table
-      const { data: profiles, error: profilesError } = await supabase
-        .from('profiles')
-        .select('id');
+      // Get total users using admin function
+      const { data: profiles, error: profilesError } = await supabase.rpc('admin_get_all_profiles');
 
       if (profilesError) throw profilesError;
 
-      // Get loan applications
-      const { data: loans, error: loansError } = await supabase
-        .from('loan_applications')
-        .select('*');
+      // Get loan applications using admin function
+      const { data: loans, error: loansError } = await supabase.rpc('admin_get_all_loan_applications');
 
       if (loansError) throw loansError;
 
-      // Get payment verifications
-      const { data: payments, error: paymentsError } = await supabase
-        .from('payment_verifications')
-        .select('*');
+      // Get payment verifications using admin function
+      const { data: payments, error: paymentsError } = await supabase.rpc('admin_get_all_payment_verifications');
 
       if (paymentsError) throw paymentsError;
 

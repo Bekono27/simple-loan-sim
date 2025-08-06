@@ -279,6 +279,64 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      admin_get_all_loan_applications: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          id: string
+          user_id: string
+          amount: number
+          status: string
+          payment_status: string
+          eligibility_result: string
+          bank_statement_filename: string
+          bank_statement_url: string
+          interest_rate: number
+          max_loan_amount: number
+          created_at: string
+          updated_at: string
+        }[]
+      }
+      admin_get_all_payment_verifications: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          id: string
+          user_id: string
+          loan_application_id: string
+          amount: number
+          payment_method: string
+          reference_number: string
+          payment_date: string
+          status: string
+          verified_at: string
+          verified_by: string
+          admin_notes: string
+          created_at: string
+          updated_at: string
+        }[]
+      }
+      admin_get_all_profiles: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          id: string
+          user_id: string
+          username: string
+          full_name: string
+          email: string
+          phone_number: string
+          register_number: string
+          birth_date: string
+          role: Database["public"]["Enums"]["app_role"]
+          created_at: string
+          updated_at: string
+        }[]
+      }
+      admin_get_user_activity: {
+        Args: { target_user_id: string }
+        Returns: {
+          loans: Json
+          payments: Json
+        }[]
+      }
       get_current_user_role: {
         Args: Record<PropertyKey, never>
         Returns: Database["public"]["Enums"]["app_role"]
