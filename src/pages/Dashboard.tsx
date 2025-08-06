@@ -43,7 +43,7 @@ export const Dashboard = () => {
 
       const { data: loansData } = await supabase
         .from('loan_applications')
-        .select('*')
+        .select('*, payment_verifications(admin_notes)')
         .eq('user_id', user.id)
         .order('created_at', { ascending: false });
 
@@ -187,14 +187,29 @@ export const Dashboard = () => {
             ) : (
               <div className="space-y-3">
                 {loanApplications.slice(0, 3).map((loan) => (
-                  <div key={loan.id} className="flex items-center justify-between p-3 border rounded-lg">
-                    <div>
-                      <p className="font-medium">{loan.amount.toLocaleString()}₮</p>
-                      <p className="text-sm text-muted-foreground">
-                        {new Date(loan.created_at).toLocaleDateString('mn-MN')}
-                      </p>
+                  <div key={loan.id} className="p-3 border rounded-lg space-y-2">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="font-medium">{loan.amount.toLocaleString()}₮</p>
+                        <p className="text-sm text-muted-foreground">
+                          {new Date(loan.created_at).toLocaleDateString('mn-MN')}
+                        </p>
+                      </div>
+                      <Badge>{getStatusText(loan.status)}</Badge>
                     </div>
-                    <Badge>{getStatusText(loan.status)}</Badge>
+                    {/* Show admin notes if loan is approved or rejected */}
+                    {(loan.status === 'approved' || loan.status === 'rejected') && (
+                      loan.payment_verifications?.[0]?.admin_notes || loan.eligibility_result
+                    ) && (
+                      <div className="p-2 bg-muted/50 rounded text-xs">
+                        <p className="font-medium text-muted-foreground mb-1">
+                          {loan.status === 'approved' ? 'Зөвшөөрлийн шалтгаан:' : 'Татгалзлын шалтгаан:'}
+                        </p>
+                        <p className="text-muted-foreground">
+                          {loan.payment_verifications?.[0]?.admin_notes || loan.eligibility_result}
+                        </p>
+                      </div>
+                    )}
                   </div>
                 ))}
               </div>

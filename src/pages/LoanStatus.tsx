@@ -18,6 +18,7 @@ interface LoanApplication {
   interest_rate?: number;
   created_at: string;
   updated_at: string;
+  payment_verifications?: { admin_notes?: string; status?: string }[];
 }
 
 interface PaymentVerification {
@@ -50,10 +51,10 @@ export const LoanStatus = () => {
         return;
       }
 
-      // Fetch latest loan application
+      // Fetch latest loan application with payment verification admin notes
       const { data: loanData, error: loanError } = await supabase
         .from('loan_applications')
-        .select('*')
+        .select('*, payment_verifications(admin_notes, status)')
         .eq('user_id', user.id)
         .order('created_at', { ascending: false })
         .limit(1)
@@ -136,7 +137,7 @@ export const LoanStatus = () => {
           icon: XCircle,
           color: "text-red-600"
         };
-      case 'approved':
+        case 'approved':
         return {
           title: "Зээл зөвшөөрөгдлөө! 🎉",
           description: "Таны зээлийн хүсэлт зөвшөөрөгдлөө",
@@ -261,7 +262,25 @@ export const LoanStatus = () => {
                 </div>
               )}
 
-              {loanApplication.eligibility_result && (
+              {/* Show admin notes for approved/rejected loans */}
+              {(loanApplication.status === 'approved' || loanApplication.status === 'rejected') && (
+                loanApplication.payment_verifications?.[0]?.admin_notes || loanApplication.eligibility_result
+              ) && (
+                <div className={`p-3 rounded-lg ${
+                  loanApplication.status === 'approved' 
+                    ? 'bg-green-50 border border-green-200' 
+                    : 'bg-red-50 border border-red-200'
+                }`}>
+                  <p className="text-sm font-medium mb-1">
+                    {loanApplication.status === 'approved' ? 'Зөвшөөрлийн шалтгаан:' : 'Татгалзлын шалтгаан:'}
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    {loanApplication.payment_verifications?.[0]?.admin_notes || loanApplication.eligibility_result}
+                  </p>
+                </div>
+              )}
+
+              {loanApplication.eligibility_result && loanApplication.status !== 'approved' && loanApplication.status !== 'rejected' && (
                 <div className="p-3 bg-muted rounded-lg">
                   <p className="text-sm font-medium mb-1">Админы тэмдэглэл:</p>
                   <p className="text-xs text-muted-foreground">{loanApplication.eligibility_result}</p>
