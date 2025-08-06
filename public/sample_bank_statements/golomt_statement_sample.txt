@@ -1,0 +1,14 @@
+Sample Bank Statement Content - Golomt Bank
+Account Holder: Цэрэнпилийн Мөнхжин
+Account Number: 1234567890
+Statement Period: December 2024
+
+Opening Balance: ₮500,000
+Closing Balance: ₮750,000
+
+Transactions:
+- 2024-12-01: Salary Credit: +₮1,200,000
+- 2024-12-05: Utility Payment: -₮85,000
+- 2024-12-10: Shopping: -₮125,000
+- 2024-12-15: Online Transfer: -₮340,000
+- 2024-12-20: Cash Withdrawal: -₮150,000

@@ -1,0 +1,14 @@
+Bank Statement - Khan Bank
+Customer: Алтанзул Гантулга  
+Account: 9876543210
+Period: November 2024
+
+Starting Balance: ₮320,000
+Ending Balance: ₮480,000
+
+Transaction History:
+- 2024-11-02: Deposit: +₮800,000
+- 2024-11-08: Rent Payment: -₮450,000
+- 2024-11-12: Grocery: -₮75,000
+- 2024-11-18: Transfer In: +₮200,000
+- 2024-11-25: ATM Withdrawal: -₮115,000
