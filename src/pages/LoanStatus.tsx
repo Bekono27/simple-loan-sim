@@ -272,7 +272,7 @@ export const LoanStatus = () => {
                     : 'bg-red-50 border border-red-200'
                 }`}>
                   <p className="text-sm font-medium mb-1">
-                    {loanApplication.status === 'approved' ? 'Зөвшөөрлийн шалтгаан:' : 'Татгалзлын шалтгаан:'}
+                    {loanApplication.status === 'approved' ? 'Зөвшөөрлийн шалтгаан:' : 'Татгалзсан шалтгаан:'}
                   </p>
                   <p className="text-xs text-muted-foreground">
                     {loanApplication.payment_verifications?.[0]?.admin_notes || loanApplication.eligibility_result}

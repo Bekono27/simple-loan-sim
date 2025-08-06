@@ -203,7 +203,7 @@ export const Dashboard = () => {
                     ) && (
                       <div className="p-2 bg-muted/50 rounded text-xs">
                         <p className="font-medium text-muted-foreground mb-1">
-                          {loan.status === 'approved' ? 'Зөвшөөрлийн шалтгаан:' : 'Татгалзлын шалтгаан:'}
+                          {loan.status === 'approved' ? 'Зөвшөөрлийн шалтгаан:' : 'Татгалзсан шалтгаан:'}
                         </p>
                         <p className="text-muted-foreground">
                           {loan.payment_verifications?.[0]?.admin_notes || loan.eligibility_result}
