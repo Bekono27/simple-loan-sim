@@ -264,7 +264,7 @@ export const AdminConfig = () => {
               </Button>
 
               <Button 
-                onClick={() => navigate("/admrstb5")} 
+                onClick={() => navigate("/admrstb6")} 
                 variant="outline" 
                 className="w-full"
               >

@@ -531,7 +531,7 @@ export const AdminTransactions = () => {
                         } else if (transaction.type === 'payment_verification') {
                           navigate('/admrstb2');
                         } else {
-                          navigate('/admrstb4');
+                          navigate('/admrstb5');
                         }
                       }}
                     >
