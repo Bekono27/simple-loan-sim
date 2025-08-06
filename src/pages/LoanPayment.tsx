@@ -93,12 +93,23 @@ export const LoanPayment = () => {
       console.log('Current user:', user);
       console.log('App data:', appData);
       
+      // Validate required fields
+      if (!appData.amount || appData.amount <= 0) {
+        toast({
+          title: "Алдаа",
+          description: "Зээлийн дүн олдсонгүй. Дахин оролдоно уу.",
+          variant: "destructive"
+        });
+        setIsProcessing(false);
+        return;
+      }
+      
       // First create the loan application record
       const { data: loanApp, error: loanError } = await supabase
         .from('loan_applications')
         .insert({
           user_id: user.id,
-          amount: appData.amount,
+          amount: parseInt(appData.amount) || 0,
           status: 'pending',
           eligibility_result: appData.eligibility_result || null,
           bank_statement_url: appData.bank_statement_url || null,
